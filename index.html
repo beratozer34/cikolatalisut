@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>11/C Koridor Savaşları</title>
+    <title>11/C Sınıfı Önü</title>
     <style>
         * {
             box-sizing: border-box;
@@ -14,7 +14,7 @@
         }
 
         body {
-            background: #1a1a1a;
+            background: #111;
             color: white;
             display: flex;
             flex-direction: column;
@@ -31,31 +31,21 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            background: rgba(0, 0, 0, 0.85);
+            background: #1a1a1a;
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: 10;
-            transition: all 0.5s ease;
         }
 
         #selection-screen h1 {
             font-size: 2.5rem;
-            margin-bottom: 10px;
-            color: #ffcc00;
-            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
-        }
-
-        #selection-screen h2 {
-            font-size: 1.5rem;
             margin-bottom: 30px;
-            color: #ddd;
+            color: #ffcc00;
         }
 
         .char-container {
             display: flex;
             gap: 40px;
-            justify-content: center;
-            flex-wrap: wrap;
         }
 
         .char-card {
@@ -65,260 +55,256 @@
             padding: 20px;
             width: 220px;
             cursor: pointer;
-            transition: transform 0.3s, border-color 0.3s;
-            text-align: center;
+            transition: transform 0.2s, border-color 0.2s;
         }
 
         .char-card:hover {
             transform: scale(1.05);
             border-color: #ffcc00;
-            box-shadow: 0 0 20px rgba(255, 204, 0, 0.4);
         }
 
         .char-img {
-            width: 150px;
-            height: 150px;
+            width: 140px;
+            height: 140px;
             object-fit: cover;
             border-radius: 50%;
             margin-bottom: 15px;
             border: 3px solid #555;
-            background-color: #333; /* Fotoğraf yüklenene kadar boş durmasın */
-        }
-
-        .char-name {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #fff;
         }
 
         /* OYUN ALANI */
         #game-container {
             display: none;
             position: relative;
-            width: 800px;
-            height: 450px;
-            background: linear-gradient(to bottom, #4a3b32 0%, #2b211a 100%); /* Okul koridoru rengi */
-            border: 6px solid #333;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            width: 900px;
+            height: 500px;
+            background: #3a2e2b; /* Okul koridoru arka plan rengi */
+            border: 6px solid #222;
+            border-radius: 4px;
             overflow: hidden;
         }
 
-        /* Okul Detayları / Arka plan tuğla çizgileri efekti */
-        .wall-details {
+        /* Gerçek Okul Duvarı Görünümü (Çizgili/Tuğlalı) */
+        .school-wall {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-                              linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
-            background-size: 40px 20px;
-            pointer-events: none;
+            top: 0; left: 0; width: 100%; height: 80%;
+            background-image: linear-gradient(rgba(0,0,0,0.15) 2px, transparent 2px),
+                              linear-gradient(90deg, rgba(0,0,0,0.15) 2px, transparent 2px);
+            background-size: 50px 25px;
+            border-bottom: 8px solid #2a201d;
         }
 
-        /* 11/C Sınıf Tabelası */
+        /* Sınıf Kapısı ve Tabelası */
+        .classroom-door {
+            position: absolute;
+            bottom: 20%;
+            left: 200px;
+            width: 100px;
+            height: 220px;
+            background: #8b5a2b;
+            border: 4px solid #5c3a1a;
+        }
+
         #class-sign {
             position: absolute;
-            top: 20px;
+            top: 30px;
             left: 50%;
             transform: translateX(-50%);
             background: #bf1515;
             color: white;
-            padding: 5px 25px;
-            font-size: 1.5rem;
+            padding: 8px 30px;
+            font-size: 1.8rem;
             font-weight: bold;
-            border-radius: 5px;
-            border: 2px solid #fff;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            letter-spacing: 2px;
+            border: 3px solid #fff;
+            border-radius: 4px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
 
-        /* Arayüz / Skor ve Can */
+        /* Arayüz */
         #ui {
             position: absolute;
-            top: 15px;
-            left: 20px;
-            right: 20px;
+            top: 20px; left: 20px; right: 20px;
             display: flex;
             justify-content: space-between;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: bold;
             z-index: 5;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
         }
 
-        .hp-bar-container {
-            width: 200px;
-            height: 20px;
-            background: #444;
-            border: 2px solid #fff;
-            border-radius: 10px;
-            overflow: hidden;
-            margin-top: 5px;
+        .hp-container {
+            width: 200px; height: 22px;
+            background: #444; border: 2px solid #fff;
+            border-radius: 5px; overflow: hidden;
         }
 
-        #hp-bar {
-            width: 100%;
-            height: 100%;
-            background: #2ecc71;
-            transition: width 0.1s ease;
-        }
+        #hp-bar { width: 100%; height: 100%; background: #2ecc71; }
 
-        /* Karakterler ve Objeler */
-        .game-obj {
+        /* 2D KARAKTER YAPISI (Gövde + Kafa Ayrımı) */
+        #player-wrapper {
             position: absolute;
+            width: 70px;
+            height: 120px;
+            bottom: 20%; /* Sınıf taban çizgisi */
+            left: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Gerçek Fotoğraftan Oluşan Kafa */
+        .player-head {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
             background-size: cover;
             background-position: center;
+            border: 2px solid #fff;
+            z-index: 2;
         }
 
-        #player {
-            width: 65px;
+        /* 2D Kıyafetli/Zırhlı Gövde */
+        .player-body {
+            width: 45px;
             height: 65px;
-            border-radius: 50%;
-            border: 3px solid #ffcc00;
-            box-shadow: 0 0 10px rgba(255,204,0,0.5);
-            bottom: 40px;
-            left: 50px;
-            transition: bottom 0.05s linear;
+            background: #2980b9; /* Berat için mavi gövde (kodla dinamik değişir) */
+            border-radius: 10px 10px 5px 5px;
+            position: relative;
+            margin-top: -5px;
+            z-index: 1;
+            border: 2px solid #1f618d;
         }
 
+        /* Silah Tutan Kol */
+        .player-arm {
+            position: absolute;
+            width: 30px;
+            height: 12px;
+            background: #3498db;
+            right: -20px;
+            top: 15px;
+            border-radius: 5px;
+            border: 2px solid #1f618d;
+        }
+
+        /* Mermi / Lazer */
         .laser {
+            position: absolute;
             width: 25px;
             height: 8px;
-            background: #00ffff;
-            box-shadow: 0 0 8px #00ffff;
+            background: #ff5722;
+            box-shadow: 0 0 8px #ff5722;
             border-radius: 4px;
         }
 
+        /* Düşman (Kürt Canavarı) */
         .enemy {
-            width: 60px;
-            height: 60px;
+            position: absolute;
+            width: 65px; height: 100px;
+            bottom: 20%;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            font-size: 45px; /* Canavar emoji olacak */
-            bottom: 40px;
+            justify-content: flex-end;
         }
 
-        /* Yere Okul Zemini Çizgisi */
+        .enemy-monster {
+            font-size: 50px;
+            line-height: 1;
+        }
+
+        /* Okul Tabanı / Zemin */
         .floor {
             position: absolute;
-            bottom: 0; left: 0; width: 100%; height: 40px;
-            background: #555;
-            border-top: 4px solid #333;
+            bottom: 0; left: 0; width: 100%; height: 20%;
+            background: #7f8c8d;
+            border-top: 6px solid #95a5a6;
         }
 
-        /* OYUN BİTTİ EKRANI */
+        /* Ekranlar */
         #game-over-screen {
             display: none;
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.85);
             flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 8;
         }
 
-        #game-over-screen h1 {
-            color: #ff3333;
-            font-size: 3rem;
-            margin-bottom: 10px;
-        }
-
         #restart-btn {
-            margin-top: 20px;
-            padding: 10px 25px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            background: #ffcc00;
-            color: #000;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.2s;
+            margin-top: 20px; padding: 10px 30px;
+            font-size: 1.2rem; background: #ffcc00;
+            color: #000; border: none; cursor: pointer; font-weight: bold;
         }
 
-        #restart-btn:hover {
-            background: #ffa500;
-        }
-
-        /* Kontrol Bilgisi */
-        #controls-info {
-            margin-top: 15px;
-            color: #aaa;
-            font-size: 0.9rem;
-            text-align: center;
-        }
+        #controls { margin-top: 15px; color: #888; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
-    <!-- 1. KARAKTER SEÇİM EKRANI -->
+    <!-- SEÇİM EKRANI -->
     <div id="selection-screen">
-        <h1>11/C KORİDOR SAVAŞLARI</h1>
-        <h2>Savaşacağın Karakteri Seç</h2>
-        
+        <h1>11/C Sınıfı Önü</h1>
         <div class="char-container">
-            <!-- BERAT ÖZER KARTI -->
-            <div class="char-card" onclick="startGame('berat.jpeg')">
-                <img src="berat.jpeg" alt="Berat Özer" class="char-img" onerror="this.src='https://via.placeholder.com/150?text=BERAT'">
-                <div class="char-name">BERAT ÖZER</div>
+            <div class="char-card" onclick="startGame('berat.jpeg', '#2980b9')">
+                <img src="berat.jpeg" class="char-img" onerror="this.src='https://via.placeholder.com/140?text=BERAT'">
+                <h3>BERAT ÖZER</h3>
             </div>
-
-            <!-- TUĞBA GÜRÜZ KARTI -->
-            <div class="char-card" onclick="startGame('tugba.jpeg')">
-                <img src="tugba.jpeg" alt="Tuğba Gürüz" class="char-img" onerror="this.src='https://via.placeholder.com/150?text=TUGBA'">
-                <div class="char-name">TUĞBA GÜRÜZ</div>
+            <div class="char-card" onclick="startGame('tugba.jpeg', '#e74c3c')">
+                <img src="tugba.jpeg" class="char-img" onerror="this.src='https://via.placeholder.com/140?text=TUGBA'">
+                <h3>TUĞBA GÜRÜZ</h3>
             </div>
         </div>
     </div>
 
-    <!-- 2. OYUN ANA ALANI -->
+    <!-- OYUN ALANI -->
     <div id="game-container">
-        <div class="wall-details"></div>
-        <div id="class-sign">11/C SINIFI</div>
+        <div class="school-wall"></div>
+        <div class="classroom-door"></div>
+        <div id="class-sign">11/C SINIFI ÖNÜ</div>
         
         <div id="ui">
             <div>
                 <div>CAN</div>
-                <div class="hp-bar-container"><div id="hp-bar"></div></div>
+                <div class="hp-container"><div id="hp-bar"></div></div>
             </div>
-            <div style="text-align: right;">
-                SKOR: <span id="score-val">0</span>
+            <div>SKOR: <span id="score-val">0</span></div>
+        </div>
+
+        <!-- 2D PARÇALI KARAKTER -->
+        <div id="player-wrapper">
+            <div id="p-head" class="player-head"></div>
+            <div id="p-body" class="player-body">
+                <div class="player-arm"></div>
             </div>
         </div>
 
-        <!-- Oyuncu (Javascript ile resmi atanacak) -->
-        <div id="player" class="game-obj"></div>
-
-        <!-- Okul Tabanı -->
         <div class="floor"></div>
 
-        <!-- Oyun Bitti Paneli -->
         <div id="game-over-screen">
-            <h1>Oyun Bitti!</h1>
-            <p>11/C Koridorunda Nakavt Oldun.</p>
-            <p>Toplam Skorun: <span id="final-score">0</span></p>
+            <h1 style="color: #ff3333; font-size: 3rem;">Oyun Bitti</h1>
+            <p>Skorun: <span id="final-score">0</span></p>
             <button id="restart-btn" onclick="resetGame()">Yeniden Başla</button>
         </div>
     </div>
 
-    <div id="controls-info">
-        Zıplamak için: <b>W veya YUKARI OK</b> | Ateş etmek için: <b>BOŞLUK (SPACE)</b>
-    </div>
+    <div id="controls">Ateş: <b>BOŞLUK (SPACE)</b> | Zıplama: <b>W veya YUKARI OK</b></div>
 
     <script>
         const selectionScreen = document.getElementById('selection-screen');
         const gameContainer = document.getElementById('game-container');
-        const player = document.getElementById('player');
+        const playerWrapper = document.getElementById('player-wrapper');
+        const pHead = document.getElementById('p-head');
+        const pBody = document.getElementById('p-body');
         const hpBar = document.getElementById('hp-bar');
         const scoreVal = document.getElementById('score-val');
         const gameOverScreen = document.getElementById('game-over-screen');
         const finalScore = document.getElementById('final-score');
 
         let isJumping = false;
-        let playerBottom = 40; 
-        const floorLevel = 40;
-        let gravity = 3;
+        let playerBottom = 100; // %20 floor yüksekliğine denk taban ayarı
+        let gravity = 4;
         let score = 0;
         let health = 100;
         let gameActive = false;
@@ -328,199 +314,166 @@
         let gameInterval;
         let enemySpawnInterval;
 
-        // Oyunu Başlatma (Karakter seçilince tetiklenir)
-        function startGame(imgName) {
-            selectionScreen.style.opacity = '0';
-            setTimeout(() => {
-                selectionScreen.style.display = 'none';
-                gameContainer.style.display = 'block';
-                player.style.backgroundImage = `url('${imgName}')`;
-                gameActive = true;
-                runGameLoop();
-            }, 400);
+        function startGame(imgName, bodyColor) {
+            selectionScreen.style.display = 'none';
+            gameContainer.style.display = 'block';
+            
+            // Kafaya yüklenen resmi bas, gövde rengini ayarla
+            pHead.style.backgroundImage = `url('${imgName}')`;
+            pBody.style.backgroundColor = bodyColor;
+            
+            gameActive = true;
+            runGame();
         }
 
-        // Tuş Dinleyicileri
         document.addEventListener('keydown', (e) => {
             if (!gameActive) return;
-
-            // Zıplama tetikleme (W veya Yukarı ok tuşu)
             if ((e.key === 'w' || e.key === 'W' || e.key === 'ArrowUp') && !isJumping) {
                 jump();
             }
-
-            // Ateş Etme (Space / Boşluk)
             if (e.key === ' ' || e.code === 'Space') {
                 shoot();
-                e.preventDefault(); // Sayfanın aşağı kaymasını önler
+                e.preventDefault();
             }
         });
 
-        // Zıplama Mekaniği
         function jump() {
             isJumping = true;
             let jumpHeight = 0;
-            
             let upInterval = setInterval(() => {
-                if (jumpHeight >= 140 || !gameActive) {
+                if (jumpHeight >= 150 || !gameActive) {
                     clearInterval(upInterval);
-                    // Düşüş başlasın
                     let downInterval = setInterval(() => {
-                        if (playerBottom <= floorLevel || !gameActive) {
+                        if (playerBottom <= 100 || !gameActive) {
                             clearInterval(downInterval);
-                            playerBottom = floorLevel;
-                            player.style.bottom = playerBottom + 'px';
+                            playerBottom = 100;
+                            playerWrapper.style.bottom = '20%';
                             isJumping = false;
                         } else {
                             playerBottom -= gravity * 1.5;
-                            player.style.bottom = playerBottom + 'px';
+                            playerWrapper.style.bottom = playerBottom + 'px';
                         }
                     }, 10);
                 } else {
                     jumpHeight += 6;
                     playerBottom += 6;
-                    player.style.bottom = playerBottom + 'px';
+                    playerWrapper.style.bottom = playerBottom + 'px';
                 }
             }, 10);
         }
 
-        // Lazer Ateşleme
         function shoot() {
             const laser = document.createElement('div');
-            laser.classList.add('laser', 'game-obj');
-            // Lazerin çıkış noktasını karaktere göre ayarla
-            laser.style.left = '115px'; 
-            laser.style.bottom = (playerBottom + 30) + 'px';
+            laser.classList.add('laser');
+            laser.style.left = '160px';
+            laser.style.bottom = (playerBottom + 45) + 'px';
             gameContainer.appendChild(laser);
             lasers.push(laser);
         }
 
-        // Kürt Canavarı Üretme
         function spawnEnemy() {
             if (!gameActive) return;
             const enemy = document.createElement('div');
-            enemy.classList.add('enemy', 'game-obj');
-            enemy.style.right = '-60px';
-            enemy.style.bottom = '40px';
-            enemy.innerHTML = '👹'; // Canavar emojisi (Kürt Canavarı)
+            enemy.classList.add('enemy');
+            enemy.style.right = '-70px';
+            enemy.style.bottom = '20%';
+            
+            // Canavar Görsel Alanı
+            const monster = document.createElement('div');
+            monster.classList.add('enemy-monster');
+            monster.innerHTML = '👹'; // Kürt Canavarı emojisi
+            
+            enemy.appendChild(monster);
             gameContainer.appendChild(enemy);
             enemies.push(enemy);
         }
 
-        // Ana Oyun Döngüsü
-        function runGameLoop() {
-            // Her 2 saniyede bir düşman gelsin
-            enemySpawnInterval = setInterval(spawnEnemy, 1800);
+        function runGame() {
+            enemySpawnInterval = setInterval(spawnEnemy, 1500);
 
             gameInterval = setInterval(() => {
                 if (!gameActive) return;
 
-                // 1. LAZERLERİ HAREKET ETTİR VE KONTROL ET
+                // Lazer hareketleri
                 for (let i = lasers.length - 1; i >= 0; i--) {
                     let l = lasers[i];
-                    let lLeft = parseInt(l.style.left);
-                    lLeft += 8; // Lazer hızı
+                    let lLeft = parseInt(l.style.left) || 160;
+                    lLeft += 10;
                     l.style.left = lLeft + 'px';
 
-                    // Ekrandan çıkan lazere elveda
-                    if (lLeft > 800) {
+                    if (lLeft > 900) {
                         l.remove();
                         lasers.splice(i, 1);
                         continue;
                     }
 
-                    // Düşman vuruldu mu kontrolü
+                    // Vurulma kontrolü
                     for (let j = enemies.length - 1; j >= 0; j--) {
                         let e = enemies[j];
-                        let eLeft = gameContainer.offsetWidth - parseInt(e.style.right) - 60;
+                        let eLeft = 900 - (parseInt(e.style.right) || 0) - 65;
                         let lBottom = parseInt(l.style.bottom);
 
-                        // Çarpışma algılama kutuları
-                        if (lLeft + 25 >= eLeft && lLeft <= eLeft + 60 && lBottom >= 40 && lBottom <= 100) {
-                            // Vuruldu!
+                        if (lLeft + 25 >= eLeft && lLeft <= eLeft + 65 && lBottom >= playerBottom && lBottom <= playerBottom + 100) {
                             e.remove();
                             enemies.splice(j, 1);
                             l.remove();
                             lasers.splice(i, 1);
-                            
                             score += 10;
                             scoreVal.innerText = score;
-                            break; 
+                            break;
                         }
                     }
                 }
 
-                // 2. DÜŞMANLARI HAREKET ETTİR VE OYUNCUYA ÇARPTI MI BAK
+                // Canavar hareketleri
                 for (let j = enemies.length - 1; j >= 0; j--) {
                     let e = enemies[j];
-                    let eRight = parseInt(e.style.right);
-                    eRight += 4; // Canavarın ilerleme hızı (skora göre artırılabilir)
+                    let eRight = parseInt(e.style.right) || 0;
+                    eRight += 5;
                     e.style.right = eRight + 'px';
 
-                    let eLeft = gameContainer.offsetWidth - eRight - 60;
+                    let eLeft = 900 - eRight - 65;
 
-                    // Canavar arkaya kaçtıysa sil
-                    if (eLeft < -60) {
+                    if (eLeft < -70) {
                         e.remove();
                         enemies.splice(j, 1);
                         continue;
                     }
 
-                    // Oyuncuyla canavar çarpıştı mı?
-                    // Oyuncu koordinatları sabit (X ekseninde left: 50, genişlik: 65)
-                    if (eLeft <= 115 && eLeft + 60 >= 50) {
-                        // Y ekseninde çarpışma (Canavar boyu 60, oyuncu zıplıyor mu?)
-                        if (playerBottom <= 100) {
-                            // HASAR ALINDI!
-                            health -= 20;
+                    // Hasar kontrolü
+                    if (eLeft <= 160 && eLeft + 65 >= 100) {
+                        if (playerBottom <= 180) { // Zıplama kurtarma kontrolü
+                            health -= 25;
                             if (health < 0) health = 0;
                             hpBar.style.width = health + '%';
                             
-                            // Canavarı sil ki üst üste sürekli vurmasın
                             e.remove();
                             enemies.splice(j, 1);
 
                             if (health <= 0) {
-                                endGame();
+                                gameActive = false;
+                                clearInterval(gameInterval);
+                                clearInterval(enemySpawnInterval);
+                                finalScore.innerText = score;
+                                gameOverScreen.style.display = 'flex';
                             }
                         }
                     }
                 }
-
             }, 20);
         }
 
-        // Oyunu Bitirme
-        function endGame() {
-            gameActive = false;
-            clearInterval(gameInterval);
-            clearInterval(enemySpawnInterval);
-            finalScore.innerText = score;
-            gameOverScreen.style.display = 'flex';
-        }
-
-        // Reset Atma (Yeniden Başlama)
         function resetGame() {
-            // Ekrandaki tüm eski nesneleri temizle
             lasers.forEach(l => l.remove());
             enemies.forEach(e => e.remove());
-            lasers = [];
-            enemies = [];
-
-            // Değerleri sıfırla
-            score = 0;
-            health = 100;
-            playerBottom = floorLevel;
-            isJumping = false;
-            
+            lasers = []; enemies = [];
+            score = 0; health = 100;
+            playerBottom = 100; isJumping = false;
             scoreVal.innerText = '0';
             hpBar.style.width = '100%';
-            player.style.bottom = floorLevel + 'px';
+            playerWrapper.style.bottom = '20%';
             gameOverScreen.style.display = 'none';
-            
-            // Seçim ekranına geri fırlat
             selectionScreen.style.display = 'flex';
-            selectionScreen.style.opacity = '1';
         }
     </script>
 </body>
