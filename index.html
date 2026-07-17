@@ -21,7 +21,7 @@
             min-height: 100vh;
             overflow: hidden;
         }
-        /* MENÜLER (SEÇİM EKRANLARI) */
+        /* MENÜLER VE SEÇİM EKRANLARI */
         .menu-screen {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -35,170 +35,166 @@
         }
         .hidden { display: none !important; }
         h1 { font-size: 2.5rem; margin-bottom: 20px; color: #ffcc00; }
-        .btn-container { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+        .char-wrapper { display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; }
+        .char-box { display: flex; flex-direction: column; align-items: center; }
         .char-card {
             background: #2a2a2a; border: 4px solid #444; border-radius: 50%;
-            width: 160px; height: 160px; cursor: pointer; transition: transform 0.2s;
-            overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            width: 150px; height: 150px; cursor: pointer; transition: transform 0.2s, border-color 0.2s;
+            overflow: hidden; display: flex; align-items: center; justify-content: center;
         }
         .char-card:hover { transform: scale(1.1); border-color: #ffcc00; }
         .char-card img { width: 100%; height: 100%; object-fit: cover; }
-        .char-label { margin-top: 10px; font-weight: bold; font-size: 1.1rem; }
+        .char-label { margin-top: 10px; font-weight: bold; font-size: 1.1rem; color: #fff; }
+        
+        /* 3. KARAKTER POPUP ANIMASYONU */
+        #popup-msg {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.95);
+            border: 3px solid #ffcc00;
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%; max-width: 450px;
+            z-index: 200; text-align: center;
+            box-shadow: 0 0 25px rgba(255, 204, 0, 0.7);
+            animation: popupIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popupIn {
+            from { transform: scale(0.7); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        #popup-msg p { font-size: 1.3rem; font-weight: bold; line-height: 1.6; color: #fff; }
+        #popup-msg span { color: #ffcc00; text-shadow: 0 0 8px rgba(255,204,0,0.5); }
+        .close-popup {
+            position: absolute; top: 10px; right: 15px;
+            font-size: 24px; color: #aaa; cursor: pointer; font-weight: bold;
+        }
+        .close-popup:hover { color: #ff3333; }
+
         .diff-btn {
             padding: 15px 40px; font-size: 1.5rem; font-weight: bold; border: none;
-            border-radius: 8px; cursor: pointer; color: #000; transition: transform 0.2s;
+            border-radius: 8px; cursor: pointer; color: #000; transition: transform 0.2s; margin: 10px;
         }
         #btn-easy { background: #2ecc71; }
         #btn-medium { background: #f1c40f; }
         #btn-hard { background: #e74c3c; }
-        .diff-btn:hover { transform: scale(1.05); }
 
-        /* OYUN HARİTASI (TÜM EKRAN) */
+        /* GERÇEKÇİ 2D OKUL HARİTASI */
         #game-area {
             position: relative;
-            width: 100vw;
-            height: 100vh;
-            background: #2c3e50; /* Genel zemin */
+            width: 100vw; height: 100vh;
+            background: #566573;
             display: none;
         }
 
-        /* 11/C SINIFI İÇİ */
+        /* 11/C SINIFA AİT ALAN */
         .room-11c {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100vw; height: 50vh;
-            background: #34495e;
-            border-bottom: 8px solid #7f8c8d;
+            position: absolute; top: 0; left: 0; width: 100vw; height: 50vh;
+            background: #eaecee; /* Sınıf içi parke/beton rengi */
+            background-image: radial-gradient(#bdc3c7 15%, transparent 16%);
+            background-size: 30px 30px;
+            border-bottom: 12px solid #2c3e50; /* Sınıf duvarı kalınlığı */
         }
-        .room-label {
-            position: absolute; top: 10px; left: 20px;
-            font-size: 1.5rem; font-weight: bold; color: #bdc3c7;
+        .room-decorations {
+            position: absolute; top: 10px; width: 100%; display: flex; justify-content: space-around;
         }
+        .board { width: 180px; height: 10px; background: #1e8449; border: 2px solid #7e5109; }
+        .teacher-desk { position: absolute; top: 40px; left: 40px; width: 70px; height: 50px; background: #a04000; border-radius: 4px; }
+        .window-line { position: absolute; top: 0; left: 30%; width: 40%; height: 6px; background: #aed6f1; }
 
-        /* SIRALAR (YAVAŞLATMA BÖLGELERİ) */
+        /* SIRALAR (YAVAŞLATMA ALANLARI) */
         .desk {
-            position: absolute;
-            background: #d35400;
-            border: 3px solid #a04000;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-            font-weight: bold;
-            color: #fff;
+            position: absolute; background: #ba4a00; border: 3px solid #5e2f0d; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold; color: #fff;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
         }
 
-        /* KORİDOR */
+        /* GERÇEKÇİ OKUL KORİDORU */
         .corridor {
-            position: absolute;
-            bottom: 0; left: 0;
-            width: 100vw; height: 50vh;
-            background: #7f8c8d;
+            position: absolute; bottom: 0; left: 0; width: 100vw; height: 50vh;
+            background: #d5dbdb; /* Koridor zemin rengi */
+            /* Gerçek fayans döşeme efekti */
+            background-image: linear-gradient(90deg, rgba(0,0,0,0.06) 1px, transparent 1px),
+                              linear-gradient(rgba(0,0,0,0.06) 1px, transparent 1px);
+            background-size: 50px 50px;
         }
-        .corridor-label {
-            position: absolute; bottom: 10px; left: 20px;
-            font-size: 1.5rem; font-weight: bold; color: #34495e;
+        .wall-panos {
+            position: absolute; top: 15px; left: 400px; width: 250px; height: 8px; background: #cd6155; border: 1px solid #fff;
+        }
+        .classroom-door {
+            position: absolute; top: -12px; left: 180px; width: 90px; height: 12px; background: #f5b041; z-index: 5;
         }
 
         /* KIRMIZI ÇÖP KUTUSU (DOĞUŞ NOKTASI) */
         #red-bin {
-            position: absolute;
-            bottom: 40px; left: 50px;
-            width: 45px; height: 45px;
-            background: #e74c3c;
-            border: 3px solid #c0392b;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            position: absolute; bottom: 35px; left: 55px; width: 45px; height: 45px;
+            background: #e74c3c; border: 3px solid #922b21; border-radius: 6px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
         }
 
         /* OYUNCU (BRAWL STARS TARZI YUVARLAK) */
         #player {
-            position: absolute;
-            width: 55px; height: 55px;
-            border-radius: 50%;
-            border: 3px solid #ffcc00;
-            background-size: cover;
-            background-position: center;
-            z-index: 10;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            position: absolute; width: 55px; height: 55px; border-radius: 50%;
+            border: 3px solid #ffcc00; background-size: cover; background-position: center;
+            z-index: 10; transform: translate(-50%, -50%); box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+        }
+        .name-tag {
+            position: absolute; top: -28px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.75); color: #fff; padding: 2px 8px;
+            font-size: 0.8rem; font-weight: bold; border-radius: 4px; white-space: nowrap;
+            border: 1px solid rgba(255,255,255,0.2);
         }
 
         /* DÜŞMAN (KÜRT) */
         .enemy {
-            position: absolute;
-            width: 50px; height: 50px;
-            background: #27ae60;
-            border-radius: 50%;
-            border: 2px solid #1e8449;
-            z-index: 9;
-            transform: translate(-50%, -50%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            position: absolute; width: 52px; height: 52px; border-radius: 50%;
+            z-index: 9; transform: translate(-50%, -50%);
+            background-image: url('https://i.imgur.com/vH98gXm.png'), linear-gradient(#27ae60, #1e8449); /* Dahili canavar emojisi/resmi yedeğiyle */
+            background-size: 80% 80%, cover; background-position: center; background-repeat: no-repeat;
+            border: 3px solid #145a32; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        .enemy-monster-style::before {
+            content: "👹"; font-size: 32px; position: absolute; top: 4px; left: 7px;
         }
         .enemy-text {
-            position: absolute;
-            top: -25px; left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.8);
-            color: #ff3333;
-            padding: 2px 6px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            border-radius: 4px;
-            white-space: nowrap;
+            position: absolute; top: -26px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.85); color: #ff3333; padding: 2px 8px;
+            font-size: 0.85rem; font-weight: bold; border-radius: 4px; white-space: nowrap;
+            border: 1px solid #ff3333;
         }
 
         /* MERMİ */
         .bullet {
-            position: absolute;
-            width: 12px; height: 12px;
-            background: #f1c40f;
-            border-radius: 50%;
-            z-index: 8;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 8px #f1c40f;
+            position: absolute; width: 14px; height: 14px; background: #f1c40f;
+            border-radius: 50%; z-index: 8; transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px #f1c40f;
         }
 
-        /* HUD / ARAYÜZ */
+        /* ARAYÜZ (HUD) */
         #hud {
-            position: absolute;
-            top: 20px; right: 20px;
-            background: rgba(0,0,0,0.6);
-            padding: 15px; border-radius: 8px;
-            font-size: 1.2rem; font-weight: bold;
-            z-index: 50; display: flex; flex-direction: column; gap: 5px;
+            position: absolute; top: 20px; right: 20px;
+            background: rgba(0,0,0,0.75); padding: 15px; border-radius: 10px;
+            font-size: 1.2rem; font-weight: bold; z-index: 50; display: flex; flex-direction: column; gap: 5px;
+            border: 2px solid #444;
         }
 
-        /* MOBİL KONTROLLER (DOKUNMATİK) */
+        /* GELİŞMİŞ ÇİFT JOYSTICK SİSTEMİ (BRAWL STARS MOBİL) */
         #mobile-controls {
-            position: absolute;
-            bottom: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 80;
-            display: none; /* JS ile mobilde açılacak */
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 80; display: none;
         }
-        .joystick-zone {
-            position: absolute; bottom: 40px; left: 40px;
-            width: 120px; height: 120px; background: rgba(255,255,255,0.1);
-            border-radius: 50%; pointer-events: auto;
+        .joystick-container {
+            position: absolute; bottom: 40px; width: 130px; height: 130px;
+            background: rgba(255,255,255,0.08); border-radius: 50%; pointer-events: auto;
             display: flex; align-items: center; justify-content: center;
-            border: 2px solid rgba(255,255,255,0.3);
+            border: 2px solid rgba(255,255,255,0.25);
         }
-        .joystick-stick {
-            width: 50px; height: 50px; background: rgba(255,255,255,0.5);
-            border-radius: 50%;
+        #move-joy-container { left: 40px; }
+        #shoot-joy-container { right: 40px; border-color: rgba(231, 76, 60, 0.4); background: rgba(231, 76, 60, 0.05); }
+        .stick {
+            width: 55px; height: 55px; border-radius: 50%; transition: transform 0.05s linear;
         }
-        .fire-button {
-            position: absolute; bottom: 50px; right: 50px;
-            width: 80px; height: 80px; background: rgba(231, 76, 60, 0.7);
-            border: 3px solid #c0392b; border-radius: 50%; pointer-events: auto;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: bold; font-size: 1.1rem; color: white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-        .fire-button:active { background: rgba(231, 76, 60, 0.9); transform: scale(0.95); }
+        #move-stick { background: rgba(255, 255, 255, 0.45); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        #shoot-stick { background: rgba(231, 76, 60, 0.65); box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3); }
     </style>
 </head>
 <body>
@@ -206,19 +202,31 @@
     <!-- 1. ADIM: KARAKTER SEÇİMİ -->
     <div id="char-screen" class="menu-screen">
         <h1>11/C Sınıfı Önü - Karakter Seç</h1>
-        <div style="display: flex; gap: 40px;">
-            <div>
-                <div class="char-card" onclick="selectCharacter('berat.jpeg')">
-                    <img src="berat.jpeg" onerror="this.src='https://via.placeholder.com/160/2980b9/ffffff?text=BERAT'">
+        <div class="char-wrapper">
+            <div class="char-box">
+                <div class="char-card" onclick="selectCharacter('berat.jpeg', 'BERAT ÖZER')">
+                    <img src="berat.jpeg" onerror="this.src='https://via.placeholder.com/150/2980b9/ffffff?text=BERAT'">
                 </div>
                 <div class="char-label">BERAT ÖZER</div>
             </div>
-            <div>
-                <div class="char-card" onclick="selectCharacter('tugba.jpeg')">
-                    <img src="tugba.jpeg" onerror="this.src='https://via.placeholder.com/160/e74c3c/ffffff?text=TUGBA'">
+            <div class="char-box">
+                <div class="char-card" onclick="selectCharacter('tugba.jpeg', 'TUĞBA GÜRÜZ')">
+                    <img src="tugba.jpeg" onerror="this.src='https://via.placeholder.com/150/e74c3c/ffffff?text=TUGBA'">
                 </div>
                 <div class="char-label">TUĞBA GÜRÜZ</div>
             </div>
+            <div class="char-box">
+                <div class="char-card" onclick="openPopup()" style="background: #ffffff;">
+                    <div style="font-size: 50px; color: #111; font-weight: bold;">+</div>
+                </div>
+                <div class="char-label">DİĞER</div>
+            </div>
+        </div>
+
+        <!-- YENİ 3. KARAKTER POPUP BİLGİLENDİRMESİ -->
+        <div id="popup-msg" class="hidden">
+            <span class="close-popup" onclick="closePopup()">&times;</span>
+            <p>SEN DE BURDA YER ALMAK ISTIYORSAN <span>@ALİBEYKOYLUBERO</span> İNSTAGRAM HESABI UZERINDEN ILETISIME GEC.</p>
         </div>
     </div>
 
@@ -232,41 +240,50 @@
         </div>
     </div>
 
-    <!-- 3. ADIM: OYUN ALANI -->
+    <!-- 3. ADIM: GERÇEKÇİ OYUN HARİTASI -->
     <div id="game-area">
-        <!-- Sınıf İçi -->
+        <!-- Gerçek Sınıf Ortamı -->
         <div class="room-11c" id="room-area">
-            <div class="room-label">11/C SINIFI</div>
-            <!-- Sıralar Dinamik Olarak JS ile Gelecek -->
+            <div class="window-line"></div>
+            <div class="room-decorations">
+                <div class="board"></div>
+            </div>
+            <div class="teacher-desk"></div>
         </div>
 
-        <!-- Koridor -->
+        <!-- Gerçek Koridor Ortamı -->
         <div class="corridor">
-            <div class="corridor-label">KORİDOR</div>
-            <!-- Başlangıç Noktası Çöp Kutusu -->
+            <div class="wall-panos"></div>
+            <div class="classroom-door"></div>
             <div id="red-bin"></div>
         </div>
 
-        <!-- Oyuncu Nesnesi -->
-        <div id="player"></div>
+        <!-- Dinamik İsim Etiketli Oyuncu -->
+        <div id="player">
+            <div id="player-name-tag" class="name-tag"></div>
+        </div>
 
-        <!-- Skor Arayüzü -->
+        <!-- Skor & Cephane Paneli -->
         <div id="hud">
             <div>CAN: <span id="hud-hp">100</span></div>
             <div>MERMİ: <span id="hud-ammo">30</span></div>
             <div>SKOR: <span id="hud-score">0</span></div>
         </div>
 
-        <!-- Mobil Kontroller -->
+        <!-- GELİŞMİŞ ÇİFT JOYSTICK (MOBİL) -->
         <div id="mobile-controls">
-            <div class="joystick-zone" id="joy-zone">
-                <div class="joystick-stick" id="joy-stick"></div>
+            <!-- Hareket Joystick'i -->
+            <div class="joystick-container" id="move-joy-container">
+                <div class="stick" id="move-stick"></div>
             </div>
-            <div class="fire-button" id="mobile-fire">ATEŞ</div>
+            <!-- Brawl Stars Usulü Ateş/Nişan Joystick'i -->
+            <div class="joystick-container" id="shoot-joy-container">
+                <div class="stick" id="shoot-stick"></div>
+            </div>
         </div>
 
-        <!-- Oyun Bitti Paneli -->
-        <div id="game-over" class="menu-screen hidden" style="background: rgba(0,0,0,0.9);">
+        <!-- Nakavt Ekranı -->
+        <div id="game-over" class="menu-screen hidden" style="background: rgba(0,0,0,0.95);">
             <h1 style="color: #ff3333; font-size: 3.5rem;">NAKAVT!</h1>
             <p style="font-size: 1.5rem; margin-bottom: 20px;">Toplam Skorun: <span id="final-score">0</span></p>
             <button class="diff-btn" style="background: #ffcc00;" onclick="location.reload()">Yeniden Başla</button>
@@ -274,183 +291,170 @@
     </div>
 
     <script>
-        // Oyun Değişkenleri
         let selectedImg = '';
-        let difficulty = 'medium';
+        let selectedName = '';
         let config = { playerSpeed: 5, enemySpeed: 2, maxAmmo: 30 };
 
-        let player = { x: 75, y: 0, vx: 0, vy: 0, hp: 100, score: 0, ammo: 30, angle: 0 };
+        let player = { x: 75, y: 0, hp: 100, score: 0, ammo: 30, angle: 0 };
         let keys = {};
         let desks = [];
         let enemies = [];
         let bullets = [];
         let isMobile = false;
 
-        // Joystick Değişkenleri
-        let joyX = 0, joyY = 0;
+        // Çift Joystick Verileri
+        let moveJoy = { x: 0, y: 0, active: false };
+        let shootJoy = { x: 0, y: 0, active: false };
 
-        // Ekran elementleri
         const gameArea = document.getElementById('game-area');
         const playerEl = document.getElementById('player');
+        const pNameTag = document.getElementById('player-name-tag');
 
-        // Mobil Cihaz Kontrolü
         if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
             isMobile = true;
             document.getElementById('mobile-controls').style.display = 'block';
         }
 
-        // 1. Karakter Seçimi
-        function selectCharacter(img) {
+        // Popup Yönetimi
+        function openPopup() { document.getElementById('popup-msg').classList.remove('hidden'); }
+        function closePopup() { document.getElementById('popup-msg').classList.add('hidden'); }
+
+        function selectCharacter(img, name) {
             selectedImg = img;
+            selectedName = name;
             document.getElementById('char-screen').classList.add('hidden');
             document.getElementById('diff-screen').classList.remove('hidden');
         }
 
-        // 2. Zorluk Seçimi ve Kurulum
         function setDifficulty(diff) {
-            difficulty = diff;
             document.getElementById('diff-screen').classList.add('hidden');
             gameArea.style.display = 'block';
 
-            // Başlangıç Y Pozisyonu Çöp Kutusunun Yanı (Ekran boyuna göre dinamik)
-            player.y = window.innerHeight - 60;
+            player.y = window.innerHeight - 55; // Kırmızı çöp kutusu hizası
 
-            if (diff === 'easy') {
-                config.enemySpeed = 1.8;
-                config.maxAmmo = 45;
-            } else if (diff === 'medium') {
-                config.enemySpeed = 3.2;
-                config.maxAmmo = 30;
-            } else if (diff === 'hard') {
-                config.enemySpeed = 4.8;
-                config.maxAmmo = 15;
-            }
+            if (diff === 'easy') { config.enemySpeed = 2.0; config.maxAmmo = 50; }
+            else if (diff === 'medium') { config.enemySpeed = 3.5; config.maxAmmo = 30; }
+            else if (diff === 'hard') { config.enemySpeed = 5.0; config.maxAmmo = 15; }
 
             player.ammo = config.maxAmmo;
             playerEl.style.backgroundImage = `url('${selectedImg}')`;
+            pNameTag.innerText = selectedName;
 
             buildClassroomDesks();
             initGameLoop();
         }
 
-        // Sınıf İçine Sıraları Yerleştirme
         function buildClassroomDesks() {
             const room = document.getElementById('room-area');
             const roomHeight = window.innerHeight * 0.5;
             const roomWidth = window.innerWidth;
 
-            // 3 Sıra halinde masalar dizelim
-            let deskId = 1;
             for (let row = 0; row < 3; row++) {
-                for (let col = 0; col < 5; col++) {
+                for (let col = 0; col < 6; col++) {
                     const d = document.createElement('div');
                     d.classList.add('desk');
                     d.innerText = "SIRA";
-                    
-                    // Hesaplanan konumlar
-                    let w = 80, h = 45;
-                    let x = 100 + col * (w + 60);
-                    let y = 60 + row * (h + 40);
+                    let w = 75, h = 45;
+                    let x = 140 + col * (w + 50);
+                    let y = 110 + row * (h + 30);
 
-                    // Ekran dışına taşmasın kontrolü
-                    if (x + w < roomWidth && y + h < roomHeight) {
-                        d.style.left = x + 'px';
-                        d.style.top = y + 'px';
-                        d.style.width = w + 'px';
-                        d.style.height = h + 'px';
+                    if (x + w < roomWidth && y + h < roomHeight - 15) {
+                        d.style.left = x + 'px'; d.style.top = y + 'px';
+                        d.style.width = w + 'px'; d.style.height = h + 'px';
                         room.appendChild(d);
-
                         desks.push({ x: x, y: y, w: w, h: h });
                     }
                 }
             }
         }
 
-        // Klavye Dinleyicileri (PC)
+        // PC Klavye ve Mouse İşlemleri
         document.addEventListener('keydown', (e) => { keys[e.key.toLowerCase()] = true; });
         document.addEventListener('keyup', (e) => { keys[e.key.toLowerCase()] = false; });
-        
-        // Fare Tıklaması ile Ateş Etme (PC)
         window.addEventListener('click', (e) => {
-            if (document.getElementById('game-area').style.display !== 'block' || isMobile) return;
-            shoot(e.clientX, e.clientY);
+            if (gameArea.style.display !== 'block' || isMobile) return;
+            shootBullet(Math.atan2(e.clientY - player.y, e.clientX - player.x));
         });
 
-        // Mobil Dokunmatik Joystick Yönetimi
-        const joyZone = document.getElementById('joy-zone');
-        const joyStick = document.getElementById('joy-stick');
-
-        joyZone.addEventListener('touchstart', handleJoy);
-        joyZone.addEventListener('touchmove', handleJoy);
-        joyZone.addEventListener('touchend', () => {
-            joyStick.style.transform = `translate(0px, 0px)`;
-            joyX = 0; joyY = 0;
+        // GELİŞMİŞ MOBİL ÇİFT JOYSTICK KONTROLLERİ
+        setupJoystick('move-joy-container', 'move-stick', (x, y) => {
+            moveJoy.x = x; moveJoy.y = y;
         });
 
-        function handleJoy(e) {
-            const touch = e.touches[0];
-            const rect = joyZone.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            
-            let dx = touch.clientX - centerX;
-            let dy = touch.clientY - centerY;
-            let dist = Math.sqrt(dx*dx + dy*dy);
-            let maxDist = rect.width / 2;
+        // Brawl Stars Usulü: Çek, Nişan Al, Bıraktığında Çat Diye Ateş Et!
+        const shootJoyContainer = document.getElementById('shoot-joy-container');
+        const shootStick = document.getElementById('shoot-stick');
 
-            if (dist > maxDist) {
-                dx = (dx / dist) * maxDist;
-                dy = (dy / dist) * maxDist;
+        shootJoyContainer.addEventListener('touchstart', (e) => { shootJoy.active = true; handleShootJoy(e); });
+        shootJoyContainer.addEventListener('touchmove', (e) => { if (shootJoy.active) handleShootJoy(e); });
+        shootJoyContainer.addEventListener('touchend', () => {
+            if (shootJoy.active) {
+                // Bırakıldığı an nişan alınan açıya mermiyi fırlat
+                if (Math.hypot(shootJoy.x, shootJoy.y) > 0.2) {
+                    shootBullet(Math.atan2(shootJoy.y, shootJoy.x));
+                }
+                shootStick.style.transform = `translate(0px, 0px)`;
+                shootJoy.x = 0; shootJoy.y = 0; shootJoy.active = false;
             }
+        });
 
-            joyStick.style.transform = `translate(${dx}px, ${dy}px)`;
-            // Değerleri -1 ile 1 arasına normalize et
-            joyX = dx / maxDist;
-            joyY = dy / maxDist;
+        function handleShootJoy(e) {
+            const touch = e.touches[0] || e.changedTouches[0];
+            const rect = shootJoyContainer.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            let dx = touch.clientX - cx; let dy = touch.clientY - cy;
+            let dist = Math.hypot(dx, dy); let maxDist = rect.width / 2;
+
+            if (dist > maxDist) { dx = (dx / dist) * maxDist; dy = (dy / dist) * maxDist; }
+            shootStick.style.transform = `translate(${dx}px, ${dy}px)`;
+            shootJoy.x = dx / maxDist; shootJoy.y = dy / maxDist;
         }
 
-        // Mobil Ateş Etme Butonu
-        document.getElementById('mobile-fire').addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            // Baktığı yöne doğru (Ateş)
-            let bx = player.x + Math.cos(player.angle) * 100;
-            let by = player.y + Math.sin(player.angle) * 100;
-            shoot(bx, by);
-        });
+        function setupJoystick(containerId, stickId, callback) {
+            const container = document.getElementById(containerId);
+            const stick = document.getElementById(stickId);
 
-        // Ateş Etme Fonksiyonu
-        function shoot(targetX, targetY) {
+            container.addEventListener('touchstart', handleMove);
+            container.addEventListener('touchmove', handleMove);
+            container.addEventListener('touchend', () => {
+                stick.style.transform = `translate(0px, 0px)`;
+                callback(0, 0);
+            });
+
+            function handleMove(e) {
+                const touch = e.touches[0];
+                const rect = container.getBoundingClientRect();
+                const cx = rect.left + rect.width / 2; const cy = rect.top + rect.height / 2;
+                let dx = touch.clientX - cx; let dy = touch.clientY - cy;
+                let dist = Math.hypot(dx, dy); let maxDist = rect.width / 2;
+
+                if (dist > maxDist) { dx = (dx / dist) * maxDist; dy = (dy / dist) * maxDist; }
+                stick.style.transform = `translate(${dx}px, ${dy}px)`;
+                callback(dx / maxDist, dy / maxDist);
+            }
+        }
+
+        function shootBullet(angle) {
             if (player.ammo <= 0) return;
-
             player.ammo--;
             document.getElementById('hud-ammo').innerText = player.ammo;
-
-            let dx = targetX - player.x;
-            let dy = targetY - player.y;
-            let angle = Math.atan2(dy, dx);
-
-            // Mobil için son yönü kilitle
-            player.angle = angle;
 
             const bEl = document.createElement('div');
             bEl.classList.add('bullet');
             gameArea.appendChild(bEl);
 
             bullets.push({
-                el: bEl,
-                x: player.x,
-                y: player.y,
-                vx: Math.cos(angle) * 12,
-                vy: Math.sin(angle) * 12
+                el: bEl, x: player.x, y: player.y,
+                vx: Math.cos(angle) * 14, vy: Math.sin(angle) * 14
             });
         }
 
-        // Düşman (KÜRT) Doğurma
         function spawnEnemy() {
-            if (document.getElementById('game-area').style.display !== 'block') return;
+            if (gameArea.style.display !== 'block') return;
 
             const eEl = document.createElement('div');
-            eEl.classList.add('enemy');
+            eEl.classList.add('enemy', 'enemy-monster-style');
             
             const txt = document.createElement('div');
             txt.classList.add('enemy-text');
@@ -458,79 +462,59 @@
             eEl.appendChild(txt);
             gameArea.appendChild(eEl);
 
-            // Sağ taraftan rastgele bir Y koordinatında doğsunlar
-            let rx = window.innerWidth + 50;
-            let ry = Math.random() * window.innerHeight;
-
-            enemies.push({ el: eEl, x: rx, y: ry });
+            enemies.push({ el: eEl, x: window.innerWidth + 60, y: Math.random() * window.innerHeight });
         }
 
-        // ANA DÖNGÜ (GAME LOOP)
         function initGameLoop() {
-            setInterval(spawnEnemy, 2000); // 2 saniyede bir düşman
+            setInterval(spawnEnemy, 1800);
 
             function update() {
-                // 1. HAREKET MANTIĞI
                 let speed = config.playerSpeed;
 
-                // Sınıf içi sıra kontrolü (Sıranın içindeyse yavaşlat)
+                // Sınıf içi sıralarda yavaşlama kontrolü
                 let insideDesk = false;
                 for (let d of desks) {
                     if (player.x >= d.x && player.x <= d.x + d.w && player.y >= d.y && player.y <= d.y + d.h) {
-                        insideDesk = true;
-                        break;
+                        insideDesk = true; break;
                     }
                 }
-                if (insideDesk) speed = speed * 0.4; // %60 Yavaşlama
+                if (insideDesk) speed *= 0.45;
 
-                // Klavye Kontrolleri
+                // Klavye yönlendirmesi
                 if (keys['w'] || keys['arrowup']) player.y -= speed;
                 if (keys['s'] || keys['arrowdown']) player.y += speed;
                 if (keys['a'] || keys['arrowleft']) player.x -= speed;
                 if (keys['d'] || keys['arrowright']) player.x += speed;
 
-                // Mobil Joystick Kontrolleri
-                if (isMobile && (Math.abs(joyX) > 0.1 || Math.abs(joyY) > 0.1)) {
-                    player.x += joyX * speed;
-                    player.y += joyY * speed;
-                    player.angle = Math.atan2(joyY, joyX); // Baktığı yönü güncelle
+                // Mobil joystick yönlendirmesi
+                if (isMobile && (Math.abs(moveJoy.x) > 0.05 || Math.abs(moveJoy.y) > 0.05)) {
+                    player.x += moveJoy.x * speed;
+                    player.y += moveJoy.y * speed;
                 }
 
-                // Ekran Sınırları Koruma
+                // Sınır koruması
                 if (player.x < 25) player.x = 25;
                 if (player.x > window.innerWidth - 25) player.x = window.innerWidth - 25;
                 if (player.y < 25) player.y = 25;
                 if (player.y > window.innerHeight - 25) player.y = window.innerHeight - 25;
 
-                // Oyuncu Çizimi
                 playerEl.style.left = player.x + 'px';
                 playerEl.style.top = player.y + 'px';
 
-                // 2. MERMİ HAREKETLERİ VE ÇARPIŞMALAR
+                // Mermi takibi
                 for (let i = bullets.length - 1; i >= 0; i--) {
-                    let b = bullets[i];
-                    b.x += b.vx;
-                    b.y += b.vy;
-                    b.el.style.left = b.x + 'px';
-                    b.el.style.top = b.y + 'px';
+                    let b = bullets[i]; b.x += b.vx; b.y += b.vy;
+                    b.el.style.left = b.x + 'px'; b.el.style.top = b.y + 'px';
 
-                    // Ekran dışı kontrolü
                     if (b.x < 0 || b.x > window.innerWidth || b.y < 0 || b.y > window.innerHeight) {
-                        b.el.remove();
-                        bullets.splice(i, 1);
-                        continue;
+                        b.el.remove(); bullets.splice(i, 1); continue;
                     }
 
-                    // Düşman vurulma kontrolü
                     for (let j = enemies.length - 1; j >= 0; j--) {
                         let e = enemies[j];
-                        let dist = Math.hypot(b.x - e.x, b.y - e.y);
-                        if (dist < 30) { // Çarpışma yarıçapı
-                            e.el.remove();
-                            enemies.splice(j, 1);
-                            b.el.remove();
-                            bullets.splice(i, 1);
-                            
+                        if (Math.hypot(b.x - e.x, b.y - e.y) < 32) {
+                            e.el.remove(); enemies.splice(j, 1);
+                            b.el.remove(); bullets.splice(i, 1);
                             player.score += 10;
                             document.getElementById('hud-score').innerText = player.score;
                             break;
@@ -538,29 +522,21 @@
                     }
                 }
 
-                // 3. DÜŞMAN HAREKETLERİ (KÜRT TAKİBİ)
+                // Düşman takibi (KÜRT)
                 for (let j = enemies.length - 1; j >= 0; j--) {
                     let e = enemies[j];
-                    let dx = player.x - e.x;
-                    let dy = player.y - e.y;
-                    let angle = Math.atan2(dy, dx);
-
+                    let angle = Math.atan2(player.y - e.y, player.x - e.x);
                     e.x += Math.cos(angle) * config.enemySpeed;
                     e.y += Math.sin(angle) * config.enemySpeed;
-                    
-                    e.el.style.left = e.x + 'px';
-                    e.el.style.top = e.y + 'px';
+                    e.el.style.left = e.x + 'px'; e.el.style.top = e.y + 'px';
 
-                    // Oyuncuya Değdi mi? (Hasar)
-                    let pDist = Math.hypot(player.x - e.x, player.y - e.y);
-                    if (pDist < 45) {
+                    if (Math.hypot(player.x - e.x, player.y - e.y) < 48) {
                         player.hp -= 10;
                         document.getElementById('hud-hp').innerText = player.hp;
-                        e.el.remove();
-                        enemies.splice(j, 1);
-
+                        e.el.remove(); enemies.splice(j, 1);
                         if (player.hp <= 0) {
-                            gameOver();
+                            document.getElementById('game-over').classList.remove('hidden');
+                            document.getElementById('final-score').innerText = player.score;
                         }
                     }
                 }
@@ -568,12 +544,6 @@
                 if (player.hp > 0) requestAnimationFrame(update);
             }
             requestAnimationFrame(update);
-        }
-
-        // Oyun Bitti
-        function gameOver() {
-            document.getElementById('game-over').classList.remove('hidden');
-            document.getElementById('final-score').innerText = player.score;
         }
     </script>
 </body>
