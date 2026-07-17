@@ -385,7 +385,13 @@
             const eEl = document.createElement('div'); eEl.classList.add('enemy');
             const t = document.createElement('div'); t.classList.add('enemy-text'); t.innerText = 'KÜRT';
             eEl.appendChild(t); gameArea.appendChild(eEl);
-            enemies.push({ el: eEl, x: window.innerWidth + 50, y: Math.random()*window.innerHeight });
+
+            // Ekranın üst yarısı (sınıf) ya da alt yarısı (koridor) rastgele doğsunlar
+            let spawnInRoom = Math.random() > 0.5;
+            let rx = window.innerWidth + 50;
+            let ry = spawnInRoom ? (Math.random() * (window.innerHeight * 0.45) + 30) : (Math.random() * (window.innerHeight * 0.45) + (window.innerHeight * 0.55));
+
+            enemies.push({ el: eEl, x: rx, y: ry, inRoom: spawnInRoom });
         }
 
         function checkWallCollision(oldX, oldY, newX, newY, size) {
@@ -405,6 +411,7 @@
             function update() {
                 if (player.hp <= 0 || player.score >= 100) return;
 
+                let midY = window.innerHeight * 0.49;
                 let pSpeed = config.playerSpeed;
                 let inDesk = false;
                 for (let d of desks) {
@@ -458,7 +465,7 @@
                     }
                 }
 
-                // Düşmanlar
+                // Düşmanlar (Yapay Zeka Güncellemesi)
                 for (let j = enemies.length - 1; j >= 0; j--) {
                     let e = enemies[j];
                     let eSpeed = config.enemySpeed;
@@ -469,12 +476,27 @@
                     }
                     if (eInDesk) eSpeed *= 0.70;
 
-                    let angle = Math.atan2(player.y - e.y, player.x - e.x);
-                    let eNextX = e.x + Math.cos(angle) * eSpeed;
-                    let eNextY = e.y + Math.sin(angle) * eSpeed;
+                    // Eğer canavar sınıfın içindeyse ve henüz koridora çıkmadıysa
+                    if (e.y <= midY) {
+                        // Kapı aralığının X koordinatı merkezi (yaklaşık 225px)
+                        let targetGateX = 225;
+                        
+                        // Kapı hizasına yaklaşana kadar X ekseninde yürü
+                        if (Math.abs(e.x - targetGateX) > 15) {
+                            e.x += (e.x > targetGateX ? -1 : 1) * eSpeed;
+                        } else {
+                            // Kapı hizasındaysa aşağı doğru yürü koridora çık
+                            e.y += eSpeed;
+                        }
+                    } else {
+                        // Koridordaysa doğrudan oyuncuyu takip et
+                        let angle = Math.atan2(player.y - e.y, player.x - e.x);
+                        let eNextX = e.x + Math.cos(angle) * eSpeed;
+                        let eNextY = e.y + Math.sin(angle) * eSpeed;
 
-                    let ePos = checkWallCollision(e.x, e.y, eNextX, eNextY, 25);
-                    e.x = ePos.x; e.y = ePos.y;
+                        let ePos = checkWallCollision(e.x, e.y, eNextX, eNextY, 25);
+                        e.x = ePos.x; e.y = ePos.y;
+                    }
 
                     e.el.style.left = e.x + 'px'; e.el.style.top = e.y + 'px';
 
@@ -497,8 +519,8 @@
         function triggerWin() {
             document.getElementById('win-screen').classList.remove('hidden');
             
-            // Sabit dinamik WhatsApp mesaj formatı (Fotoğraf ve text birleşimi için uygun format)
-            let text = encodeURIComponent(`${selectedName}, TÜM KÜRTLERİ SİKTİ TEBRİK EDİYORUZ! OYUN LİNKİ VE FOTOĞRAF: ${window.location.origin}/${selectedImg}`);
+            // Temiz, sadece troll mesajı içeren WhatsApp linki (404 hatası veren dosya uzantıları silindi)
+            let text = encodeURIComponent(`${selectedName}, TÜM KÜRTLERİ SİKTİ TEBRİK EDİYORUZ! 🏆 Sen de bu amansız 11/C koridor savaşına katıl ve rekorunu kır! Link: ${window.location.origin}${window.location.pathname}`);
             let waUrl = `https://api.whatsapp.com/send?text=${text}`;
             document.getElementById('share-link').setAttribute('href', waUrl);
         }
