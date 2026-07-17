@@ -57,10 +57,17 @@
             position: absolute; top: 49vh; left: 0; width: 100vw; height: 2vh;
             background: #2c3e50; z-index: 15;
         }
-        /* Kapı Boşluğu Alanı */
-        .door-gap {
-            position: absolute; top: 49vh; left: 180px; width: 90px; height: 2vh;
-            background: transparent; z-index: 16;
+        
+        /* GERÇEKÇİ GÖRÜNEN SINIF KAPISI */
+        .classroom-door {
+            position: absolute; top: 48.5vh; left: 180px; width: 90px; height: 3vh;
+            background: #cd7f32; border: 2px solid #5c3a21; border-radius: 2px;
+            z-index: 16; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+        .classroom-door::after {
+            content: ""; width: 8px; height: 8px; background: #000; border-radius: 50%;
+            position: absolute; right: 10px;
         }
 
         .room-11c {
@@ -132,6 +139,7 @@
             position: absolute; top: -26px; left: 50%; transform: translateX(-50%);
             background: rgba(0,0,0,0.85); color: #ff3333; padding: 2px 8px;
             font-size: 0.85rem; font-weight: bold; border-radius: 4px; white-space: nowrap;
+            border: 1px solid #ff3333;
         }
 
         .bullet { position: absolute; width: 14px; height: 14px; background: #795548; border-radius: 50%; z-index: 17; transform: translate(-50%, -50%); border: 2px solid #fff; }
@@ -149,7 +157,7 @@
         }
         @keyframes textPulse { from { transform: scale(0.98); } to { transform: scale(1.02); } }
 
-        /* UZAY MORU BUTON */
+        /* UZAY MORU WHATSAPP BUTONU */
         .share-btn {
             background: #4a148c; color: #e1bee7; font-size: 1.4rem; font-weight: bold;
             padding: 15px 35px; border: 2px solid #aa00ff; border-radius: 30px; cursor: pointer;
@@ -210,7 +218,7 @@
     <div id="game-area">
         <div class="room-11c" id="room-area"><div class="room-label">11/C</div></div>
         <div class="wall-barrier"></div>
-        <div class="door-gap" id="door-zone"></div>
+        <div class="classroom-door" id="door-element"></div>
         <div class="corridor">
             <div id="red-bin">
                 <div class="bin-label">ÇÖP KUTUSU</div>
@@ -237,7 +245,7 @@
         <!-- SONUÇ EKRANLARI -->
         <div id="win-screen" class="menu-screen hidden" style="background: rgba(0,0,0,0.95);">
             <div class="gold-glow">BRAVO TÜM KÜRTLERİ SİKTİN SENİNLE GURUR DUYUYORUM</div>
-            <a id="share-link" class="share-btn" target="_blank">ZAFERİ X'TE PAYLAŞ</a>
+            <a id="share-link" class="share-btn" target="_blank">ZAFERİ WHATSAPP'TA PAYLAŞ</a>
             <button class="diff-btn" style="background:#f1c40f;margin-top:30px;" onclick="location.reload()">Tekrar Oyna</button>
         </div>
 
@@ -313,7 +321,6 @@
             shoot(angle);
         });
 
-        // MOBİL JOYSTICK SİSTEMLERİ
         setupJoystick('move-joy-container', 'move-stick', (x, y) => { moveJoy.x = x; moveJoy.y = y; });
         
         const shootContainer = document.getElementById('shoot-joy-container');
@@ -368,7 +375,6 @@
             document.getElementById('bin-count-val').innerText = deadEnemiesCount;
             const deadVis = document.createElement('div');
             deadVis.classList.add('stacked-dead');
-            // Çöp kutusu sınırları içerisinde üst üste yığılma efekti
             deadVis.style.left = (Math.random() * 25 + 10) + 'px';
             deadVis.style.top = (Math.random() * 25 + 10) + 'px';
             document.getElementById('red-bin').appendChild(deadVis);
@@ -384,9 +390,8 @@
 
         function checkWallCollision(oldX, oldY, newX, newY, size) {
             let midY = window.innerHeight * 0.49;
-            // Eğer kalın duvar çizgisine giriyorsa engelle
             if (oldY <= midY && newY > midY - size) {
-                if (newX < 180 || newX > 270) return { x: newX, y: midY - size }; // Sadece kapıdan geçiş
+                if (newX < 180 || newX > 270) return { x: newX, y: midY - size };
             }
             if (oldY >= midY + 10 && newY < midY + 10 + size) {
                 if (newX < 180 || newX > 270) return { x: newX, y: midY + 10 + size };
@@ -405,7 +410,7 @@
                 for (let d of desks) {
                     if (player.x >= d.x && player.x <= d.x + d.w && player.y >= d.y && player.y <= d.y + d.h) { inDesk = true; break; }
                 }
-                if (inDesk) pSpeed *= 0.45; // Oyuncu %55 yavaşlar
+                if (inDesk) pSpeed *= 0.45;
 
                 let oldX = player.x, oldY = player.y;
                 let nextX = player.x, nextY = player.y;
@@ -419,7 +424,6 @@
                     nextX += moveJoy.x * pSpeed; nextY += moveJoy.y * pSpeed;
                 }
 
-                // Duvar çarpışma koruması
                 let pos = checkWallCollision(oldX, oldY, nextX, nextY, 25);
                 player.x = pos.x; player.y = pos.y;
 
@@ -427,10 +431,6 @@
                 if (player.y < 25) player.y = 25; if (player.y > window.innerHeight - 25) player.y = window.innerHeight - 25;
 
                 playerEl.style.left = player.x + 'px'; playerEl.style.top = player.y + 'px';
-
-                if (!isMobile && (keys['w'] || keys['s'] || keys['a'] || keys['d'])) {
-                    // Mouse yönü PC'de her zaman tıklandığı yere bakar, silah açısı tıkla güncellenir.
-                }
 
                 // Mermiler
                 for (let i = bullets.length - 1; i >= 0; i--) {
@@ -467,13 +467,12 @@
                     for (let d of desks) {
                         if (e.x >= d.x && e.x <= d.x + d.w && e.y >= d.y && e.y <= d.y + d.h) { eInDesk = true; break; }
                     }
-                    if (eInDesk) eSpeed *= 0.70; // Düşman sıralarda sadece %30 yavaşlar (Karakter kadar değil!)
+                    if (eInDesk) eSpeed *= 0.70;
 
                     let angle = Math.atan2(player.y - e.y, player.x - e.x);
                     let eNextX = e.x + Math.cos(angle) * eSpeed;
                     let eNextY = e.y + Math.sin(angle) * eSpeed;
 
-                    // Düşman da duvar engeline takılır
                     let ePos = checkWallCollision(e.x, e.y, eNextX, eNextY, 25);
                     e.x = ePos.x; e.y = ePos.y;
 
@@ -498,14 +497,10 @@
         function triggerWin() {
             document.getElementById('win-screen').classList.remove('hidden');
             
-            // Sabit görsel meta verisini ve dinamik yazıyı içeren Uzay Moru Paylaşım Linki
-            let text = encodeURIComponent(`${selectedName}, TÜM KÜRTLERİ SİKTİ TEBRİK EDİYORUZ!`);
-            let currentUrl = encodeURIComponent(window.location.href);
-            let imageUrl = encodeURIComponent(`${window.location.origin}/${selectedImg}`);
-            
-            // X (Twitter) paylaşım linki kart tasarımı formatında kuruldu
-            let xUrl = `https://x.com/intent/tweet?text=${text}&url=${currentUrl}&image=${imageUrl}`;
-            document.getElementById('share-link').setAttribute('href', xUrl);
+            // Sabit dinamik WhatsApp mesaj formatı (Fotoğraf ve text birleşimi için uygun format)
+            let text = encodeURIComponent(`${selectedName}, TÜM KÜRTLERİ SİKTİ TEBRİK EDİYORUZ! OYUN LİNKİ VE FOTOĞRAF: ${window.location.origin}/${selectedImg}`);
+            let waUrl = `https://api.whatsapp.com/send?text=${text}`;
+            document.getElementById('share-link').setAttribute('href', waUrl);
         }
     </script>
 </body>
