@@ -21,6 +21,7 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: #1a1a1a; display: flex; flex-direction: column;
             align-items: center; justify-content: center; z-index: 100; text-align: center;
+            padding: 20px;
         }
         .hidden { display: none !important; }
         h1 { font-size: 2.5rem; margin-bottom: 20px; color: #ffcc00; }
@@ -48,6 +49,29 @@
 
         .diff-btn { padding: 12px 35px; font-size: 1.3rem; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; margin: 10px; }
         #btn-easy { background: #2ecc71; } #btn-medium { background: #f1c40f; } #btn-hard { background: #e74c3c; }
+
+        /* UYARI / DISCLAIMER EKRANI */
+        .warning-container {
+            max-width: 700px; background: rgba(0, 0, 0, 0.6); padding: 30px;
+            border-radius: 15px; border: 2px solid #ffdf00;
+            box-shadow: 0 0 20px rgba(255, 223, 0, 0.3);
+        }
+        .warning-checkbox-label {
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+            max-width: 650px; margin: 25px auto; cursor: pointer; text-align: left;
+            line-height: 1.5; font-size: 0.95rem; font-weight: 600;
+        }
+        .warning-checkbox-label input {
+            width: 24px; height: 24px; cursor: pointer; accent-color: #ffdf00; flex-shrink: 0;
+        }
+        #start-game-btn {
+            padding: 15px 45px; font-size: 1.5rem; font-weight: bold; border: none;
+            border-radius: 8px; background: #ffdf00; color: #000; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255,223,0,0.4); transition: all 0.3s ease;
+        }
+        #start-game-btn:disabled {
+            background: #555; color: #aaa; cursor: not-allowed; box-shadow: none; opacity: 0.6;
+        }
 
         /* HARİTA VE ORTAM */
         #game-area { position: relative; width: 100vw; height: 100vh; display: none; background: #2c3e50; }
@@ -157,7 +181,6 @@
         }
         @keyframes textPulse { from { transform: scale(0.98); } to { transform: scale(1.02); } }
 
-        /* UZAY MORU WHATSAPP BUTONU */
         .share-btn {
             background: #4a148c; color: #e1bee7; font-size: 1.4rem; font-weight: bold;
             padding: 15px 35px; border: 2px solid #aa00ff; border-radius: 30px; cursor: pointer;
@@ -211,6 +234,22 @@
             <button id="btn-easy" class="diff-btn" onclick="setDifficulty('easy')">KOLAY</button>
             <button id="btn-medium" class="diff-btn" onclick="setDifficulty('medium')">ORTA</button>
             <button id="btn-hard" class="diff-btn" onclick="setDifficulty('hard')">ZOR</button>
+        </div>
+    </div>
+
+    <!-- 2.5 UYARI / DISCLAIMER EKRANI (ZORLUKTAN SONRA AÇILIR) -->
+    <div id="warning-screen" class="menu-screen hidden">
+        <div class="warning-container">
+            <div class="gold-glow" style="font-size: 1.4rem; line-height: 1.6; margin-bottom: 0;">
+                KÜRT KELİMESİ TAMAMEN YARATICININ KENDİ KOMİK BİR OLAYINDAN ESİNLENMESİDİR. BU OYUN TAMAMEN MİZAHİ AMAÇLIDIR. HERHANGİ BİR ETNİK KİMLİK HEDEF ALINMAMIŞTIR. SADECE ESKİ BİR YAŞANAN OLAYDAN ESİNLENEREK BU KARAKTER MİZAHİ AMAÇLA YARATILMIŞTIR!
+            </div>
+            
+            <label class="warning-checkbox-label" style="color: #ffdf00; text-shadow: 0 0 5px rgba(255, 223, 0, 0.4);">
+                <input type="checkbox" id="warning-check" onchange="toggleStartButton()">
+                <span>BU KUTUYU İŞARETLEYEREK HERHANGİ BİR KÖTÜ AMAÇ OLMADIĞINI TAMAMEN ŞAKA, MİZAHİ VE EĞLENCE AMACIYLA OLDUĞUNU OKUYUP, ONAYLAYIP EĞLENCEYE ORTAK OLUYORUM.</span>
+            </label>
+            
+            <button id="start-game-btn" disabled onclick="launchGame()">OYUNU BAŞLAT</button>
         </div>
     </div>
 
@@ -282,12 +321,24 @@
         function setDifficulty(diff) {
             difficulty = diff;
             document.getElementById('diff-screen').classList.add('hidden');
-            gameArea.style.display = 'block';
-            player.y = window.innerHeight - 65;
+            // Oyun alanını açmak yerine önce uyarı ekranını açıyoruz
+            document.getElementById('warning-screen').classList.remove('hidden');
 
             if (diff === 'easy') { config.enemySpeed = 2.0; config.maxAmmo = 60; }
             else if (diff === 'medium') { config.enemySpeed = 3.5; config.maxAmmo = 40; }
             else if (diff === 'hard') { config.enemySpeed = 5.0; config.maxAmmo = 20; }
+        }
+
+        function toggleStartButton() {
+            const checkBox = document.getElementById('warning-check');
+            const startBtn = document.getElementById('start-game-btn');
+            startBtn.disabled = !checkBox.checked;
+        }
+
+        function launchGame() {
+            document.getElementById('warning-screen').classList.add('hidden');
+            gameArea.style.display = 'block';
+            player.y = window.innerHeight - 65;
 
             player.ammo = config.maxAmmo;
             playerEl.style.backgroundImage = `url('${selectedImg}')`;
@@ -386,7 +437,6 @@
             const t = document.createElement('div'); t.classList.add('enemy-text'); t.innerText = 'KÜRT';
             eEl.appendChild(t); gameArea.appendChild(eEl);
 
-            // Ekranın üst yarısı (sınıf) ya da alt yarısı (koridor) rastgele doğsunlar
             let spawnInRoom = Math.random() > 0.5;
             let rx = window.innerWidth + 50;
             let ry = spawnInRoom ? (Math.random() * (window.innerHeight * 0.45) + 30) : (Math.random() * (window.innerHeight * 0.45) + (window.innerHeight * 0.55));
@@ -465,7 +515,7 @@
                     }
                 }
 
-                // Düşmanlar (Yapay Zeka Güncellemesi)
+                // Düşmanlar
                 for (let j = enemies.length - 1; j >= 0; j--) {
                     let e = enemies[j];
                     let eSpeed = config.enemySpeed;
@@ -476,20 +526,14 @@
                     }
                     if (eInDesk) eSpeed *= 0.70;
 
-                    // Eğer canavar sınıfın içindeyse ve henüz koridora çıkmadıysa
                     if (e.y <= midY) {
-                        // Kapı aralığının X koordinatı merkezi (yaklaşık 225px)
                         let targetGateX = 225;
-                        
-                        // Kapı hizasına yaklaşana kadar X ekseninde yürü
                         if (Math.abs(e.x - targetGateX) > 15) {
                             e.x += (e.x > targetGateX ? -1 : 1) * eSpeed;
                         } else {
-                            // Kapı hizasındaysa aşağı doğru yürü koridora çık
                             e.y += eSpeed;
                         }
                     } else {
-                        // Koridordaysa doğrudan oyuncuyu takip et
                         let angle = Math.atan2(player.y - e.y, player.x - e.x);
                         let eNextX = e.x + Math.cos(angle) * eSpeed;
                         let eNextY = e.y + Math.sin(angle) * eSpeed;
@@ -518,8 +562,6 @@
 
         function triggerWin() {
             document.getElementById('win-screen').classList.remove('hidden');
-            
-            // Temiz, sadece troll mesajı içeren WhatsApp linki (404 hatası veren dosya uzantıları silindi)
             let text = encodeURIComponent(`${selectedName}, TÜM KÜRTLERİ SİKTİ TEBRİK EDİYORUZ! 🏆 Sen de bu amansız 11/C koridor savaşına katıl ve rekorunu kır! Link: ${window.location.origin}${window.location.pathname}`);
             let waUrl = `https://api.whatsapp.com/send?text=${text}`;
             document.getElementById('share-link').setAttribute('href', waUrl);
