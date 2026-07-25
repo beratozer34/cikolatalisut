@@ -1,1 +1,571 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>11/C Sınıfı Önü</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0; padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+            touch-action: none;
+        }
+        body {
+            background: #111; color: white;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; overflow: hidden;
+        }
+        .menu-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #1a1a1a; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; z-index: 100; text-align: center;
+            padding: 20px;
+        }
+        .hidden { display: none !important; }
+        h1 { font-size: 2.5rem; margin-bottom: 20px; color: #ffcc00; }
+        .char-wrapper { display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; }
+        .char-box { display: flex; flex-direction: column; align-items: center; }
+        .char-card {
+            background: #2a2a2a; border: 4px solid #444; border-radius: 50%;
+            width: 140px; height: 140px; cursor: pointer; transition: transform 0.2s;
+            overflow: hidden; display: flex; align-items: center; justify-content: center;
+        }
+        .char-card:hover { transform: scale(1.1); border-color: #ffcc00; }
+        .char-card img { width: 100%; height: 100%; object-fit: cover; }
+        .char-label { margin-top: 10px; font-weight: bold; font-size: 1.1rem; }
+        
+        #popup-msg {
+            position: absolute; background: rgba(0, 0, 0, 0.95); border: 3px solid #ffcc00;
+            border-radius: 15px; padding: 30px; width: 90%; max-width: 450px;
+            z-index: 200; text-align: center; box-shadow: 0 0 25px rgba(255, 204, 0, 0.7);
+            animation: popupIn 0.3s ease;
+        }
+        @keyframes popupIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        #popup-msg p { font-size: 1.3rem; font-weight: bold; line-height: 1.6; }
+        #popup-msg span { color: #ffcc00; }
+        .close-popup { position: absolute; top: 10px; right: 15px; font-size: 24px; color: #aaa; cursor: pointer; }
 
+        .diff-btn { padding: 12px 35px; font-size: 1.3rem; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; margin: 10px; }
+        #btn-easy { background: #2ecc71; } #btn-medium { background: #f1c40f; } #btn-hard { background: #e74c3c; }
+
+        /* UYARI / DISCLAIMER EKRANI */
+        .warning-container {
+            max-width: 700px; background: rgba(0, 0, 0, 0.6); padding: 30px;
+            border-radius: 15px; border: 2px solid #ffdf00;
+            box-shadow: 0 0 20px rgba(255, 223, 0, 0.3);
+        }
+        .warning-checkbox-label {
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+            max-width: 650px; margin: 25px auto; cursor: pointer; text-align: left;
+            line-height: 1.5; font-size: 0.95rem; font-weight: 600;
+        }
+        .warning-checkbox-label input {
+            width: 24px; height: 24px; cursor: pointer; accent-color: #ffdf00; flex-shrink: 0;
+        }
+        #start-game-btn {
+            padding: 15px 45px; font-size: 1.5rem; font-weight: bold; border: none;
+            border-radius: 8px; background: #ffdf00; color: #000; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255,223,0,0.4); transition: all 0.3s ease;
+        }
+        #start-game-btn:disabled {
+            background: #555; color: #aaa; cursor: not-allowed; box-shadow: none; opacity: 0.6;
+        }
+
+        /* HARİTA VE ORTAM */
+        #game-area { position: relative; width: 100vw; height: 100vh; display: none; background: #2c3e50; }
+        
+        /* DUVAR ENGELİ */
+        .wall-barrier {
+            position: absolute; top: 49vh; left: 0; width: 100vw; height: 2vh;
+            background: #2c3e50; z-index: 15;
+        }
+        
+        /* GERÇEKÇİ GÖRÜNEN SINIF KAPISI */
+        .classroom-door {
+            position: absolute; top: 48.5vh; left: 180px; width: 90px; height: 3vh;
+            background: #cd7f32; border: 2px solid #5c3a21; border-radius: 2px;
+            z-index: 16; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+        .classroom-door::after {
+            content: ""; width: 8px; height: 8px; background: #000; border-radius: 50%;
+            position: absolute; right: 10px;
+        }
+
+        .room-11c {
+            position: absolute; top: 0; left: 0; width: 100vw; height: 49vh;
+            background: #eaecee; background-image: radial-gradient(#bdc3c7 15%, transparent 16%); background-size: 30px 30px;
+            border-bottom: 10px solid #2c3e50;
+        }
+        .room-label {
+            position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
+            font-size: 2rem; font-weight: bold; color: #fff; background: #2980b9;
+            padding: 5px 20px; border-radius: 5px; border: 2px solid #fff;
+        }
+
+        .desk { position: absolute; background: #ba4a00; border: 3px solid #5e2f0d; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold; color: #fff; }
+
+        .corridor {
+            position: absolute; bottom: 0; left: 0; width: 100vw; height: 49vh;
+            background: #d5dbdb; background-image: linear-gradient(90deg, rgba(0,0,0,0.06) 1px, transparent 1px), linear-gradient(rgba(0,0,0,0.06) 1px, transparent 1px); background-size: 50px 50px;
+            border-top: 10px solid #2c3e50;
+        }
+
+        /* ÇÖP KUTUSU */
+        #red-bin {
+            position: absolute; bottom: 35px; left: 55px; width: 65px; height: 65px;
+            background: #e74c3c; border: 3px solid #922b21; border-radius: 6px; z-index: 12;
+        }
+        .bin-label {
+            position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+            background: #000; color: #fff; font-size: 0.7rem; padding: 1px 4px; border-radius: 3px; font-weight: bold; white-space: nowrap;
+        }
+        .bin-count {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 1.1rem; font-weight: bold; color: #fff; z-index: 20;
+        }
+        .stacked-dead {
+            position: absolute; width: 20px; height: 20px; background: rgba(39, 174, 96, 0.7);
+            border-radius: 50%; border: 1px solid #145a32;
+        }
+
+        /* KARAKTER VE SİLAH */
+        #player {
+            position: absolute; width: 55px; height: 55px; border-radius: 50%;
+            border: 3px solid #ffcc00; background-size: cover; background-position: center;
+            z-index: 20; transform: translate(-50%, -50%);
+        }
+        .name-tag {
+            position: absolute; top: -28px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.75); color: #fff; padding: 2px 8px;
+            font-size: 0.8rem; font-weight: bold; border-radius: 4px; white-space: nowrap;
+        }
+        /* ÇİKOLATALI SÜT SİLAHI */
+        .milk-weapon {
+            position: absolute; width: 35px; height: 16px;
+            background: #3e2723; border: 2px solid #795548; border-radius: 3px;
+            top: 50%; left: 100%; transform-origin: left center;
+        }
+        .milk-weapon::after {
+            content: "SÜT"; color: #fff; font-size: 8px; font-weight: bold;
+            position: absolute; top: 0; left: 4px; line-height: 12px;
+        }
+        .milk-straw {
+            position: absolute; right: -6px; top: 4px; width: 6px; height: 4px; background: #ffeb3b;
+        }
+
+        /* DÜŞMAN */
+        .enemy { position: absolute; width: 52px; height: 52px; border-radius: 50%; z-index: 18; transform: translate(-50%, -50%); background: #27ae60; border: 3px solid #145a32; }
+        .enemy::before { content: "👹"; font-size: 30px; position: absolute; top: 5px; left: 8px; }
+        .enemy-text {
+            position: absolute; top: -26px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.85); color: #ff3333; padding: 2px 8px;
+            font-size: 0.85rem; font-weight: bold; border-radius: 4px; white-space: nowrap;
+            border: 1px solid #ff3333;
+        }
+
+        .bullet { position: absolute; width: 14px; height: 14px; background: #795548; border-radius: 50%; z-index: 17; transform: translate(-50%, -50%); border: 2px solid #fff; }
+
+        #hud {
+            position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.75);
+            padding: 15px; border-radius: 10px; font-size: 1.2rem; font-weight: bold; z-index: 50; display: flex; flex-direction: column; gap: 5px;
+        }
+
+        /* ANIMASYONLU ALTIN METINLER */
+        .gold-glow {
+            color: #ffdf00; font-size: 2.2rem; font-weight: bold; margin-bottom: 25px;
+            text-shadow: 0 0 10px rgba(255, 223, 0, 0.6), 0 0 20px rgba(255, 215, 0, 0.4);
+            animation: textPulse 1.5s infinite alternate; padding: 0 20px;
+        }
+        @keyframes textPulse { from { transform: scale(0.98); } to { transform: scale(1.02); } }
+
+        .share-btn {
+            background: #4a148c; color: #e1bee7; font-size: 1.4rem; font-weight: bold;
+            padding: 15px 35px; border: 2px solid #aa00ff; border-radius: 30px; cursor: pointer;
+            text-decoration: none; display: inline-block; margin-top: 20px;
+            box-shadow: 0 0 15px rgba(170, 0, 255, 0.5); transition: background 0.3s;
+        }
+        .share-btn:hover { background: #aa00ff; color: #fff; }
+
+        /* MOBİL ÇİFT JOYSTICK */
+        #mobile-controls { position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 80; display: none; }
+        .joystick-container { position: absolute; bottom: 40px; width: 120px; height: 120px; background: rgba(255,255,255,0.08); border-radius: 50%; pointer-events: auto; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255,255,255,0.25); }
+        #move-joy-container { left: 40px; } #shoot-joy-container { right: 40px; }
+        .stick { width: 50px; height: 50px; border-radius: 50%; }
+        #move-stick { background: rgba(255, 255, 255, 0.4); }
+        #shoot-stick { background: rgba(231, 76, 60, 0.5); }
+    </style>
+</head>
+<body>
+
+    <!-- 1. KARAKTER SEÇİMİ -->
+    <div id="char-screen" class="menu-screen">
+        <h1>11/C Sınıfı Önü - Karakter Seç</h1>
+        <div class="char-wrapper">
+            <div class="char-box">
+                <div class="char-card" onclick="selectCharacter('berat.jpeg', 'BERAT ÖZER')">
+                    <img src="berat.jpeg" onerror="this.src='https://via.placeholder.com/150/2980b9/ffffff?text=BERAT'">
+                </div>
+                <div class="char-label">BERAT ÖZER</div>
+            </div>
+            <div class="char-box">
+                <div class="char-card" onclick="selectCharacter('tugba.jpeg', 'TUĞBA GÜRÜZ')">
+                    <img src="tugba.jpeg" onerror="this.src='https://via.placeholder.com/150/e74c3c/ffffff?text=TUGBA'">
+                </div>
+                <div class="char-label">TUĞBA GÜRÜZ</div>
+            </div>
+            <div class="char-box">
+                <div class="char-card" onclick="openPopup()" style="background: #fff;"><div style="font-size:50px;color:#111;font-weight:bold;">+</div></div>
+                <div class="char-label">DİĞER</div>
+            </div>
+        </div>
+        <div id="popup-msg" class="hidden">
+            <span class="close-popup" onclick="closePopup()">&times;</span>
+            <p>SEN DE BURDA YER ALMAK ISTIYORSAN <span>@ALİBEYKOYLUBERO</span> İNSTAGRAM HESABI UZERINDEN ILETISIME GEC.</p>
+        </div>
+    </div>
+
+    <!-- 2. ZORLUK SEÇİMİ -->
+    <div id="diff-screen" class="menu-screen hidden">
+        <h1>Zorluk Derecesi Seç</h1>
+        <div class="btn-container">
+            <button id="btn-easy" class="diff-btn" onclick="setDifficulty('easy')">KOLAY</button>
+            <button id="btn-medium" class="diff-btn" onclick="setDifficulty('medium')">ORTA</button>
+            <button id="btn-hard" class="diff-btn" onclick="setDifficulty('hard')">ZOR</button>
+        </div>
+    </div>
+
+    <!-- 2.5 UYARI / DISCLAIMER EKRANI (ZORLUKTAN SONRA AÇILIR) -->
+    <div id="warning-screen" class="menu-screen hidden">
+        <div class="warning-container">
+            <div class="gold-glow" style="font-size: 1.4rem; line-height: 1.6; margin-bottom: 0;">
+                KÜRT KELİMESİ TAMAMEN YARATICININ KENDİ KOMİK BİR OLAYINDAN ESİNLENMESİDİR. BU OYUN TAMAMEN MİZAHİ AMAÇLIDIR. HERHANGİ BİR ETNİK KİMLİK HEDEF ALINMAMIŞTIR. SADECE ESKİ BİR YAŞANAN OLAYDAN ESİNLENEREK BU KARAKTER MİZAHİ AMAÇLA YARATILMIŞTIR!
+            </div>
+            
+            <label class="warning-checkbox-label" style="color: #ffdf00; text-shadow: 0 0 5px rgba(255, 223, 0, 0.4);">
+                <input type="checkbox" id="warning-check" onchange="toggleStartButton()">
+                <span>BU KUTUYU İŞARETLEYEREK HERHANGİ BİR KÖTÜ AMAÇ OLMADIĞINI TAMAMEN ŞAKA, MİZAHİ VE EĞLENCE AMACIYLA OLDUĞUNU OKUYUP, ONAYLAYIP EĞLENCEYE ORTAK OLUYORUM.</span>
+            </label>
+            
+            <button id="start-game-btn" disabled onclick="launchGame()">OYUNU BAŞLAT</button>
+        </div>
+    </div>
+
+    <!-- 3. OYUN ALANI -->
+    <div id="game-area">
+        <div class="room-11c" id="room-area"><div class="room-label">11/C</div></div>
+        <div class="wall-barrier"></div>
+        <div class="classroom-door" id="door-element"></div>
+        <div class="corridor">
+            <div id="red-bin">
+                <div class="bin-label">ÇÖP KUTUSU</div>
+                <div id="bin-count-val" class="bin-count">0</div>
+            </div>
+        </div>
+
+        <div id="player">
+            <div id="player-name-tag" class="name-tag"></div>
+            <div id="weapon" class="milk-weapon"><div class="milk-straw"></div></div>
+        </div>
+
+        <div id="hud">
+            <div>CAN: <span id="hud-hp">100</span></div>
+            <div>MERMİ: <span id="hud-ammo">30</span></div>
+            <div>SKOR: <span id="hud-score">0</span></div>
+        </div>
+
+        <div id="mobile-controls">
+            <div class="joystick-container" id="move-joy-container"><div class="stick" id="move-stick"></div></div>
+            <div class="joystick-container" id="shoot-joy-container"><div class="stick" id="shoot-stick"></div></div>
+        </div>
+
+        <!-- SONUÇ EKRANLARI -->
+        <div id="win-screen" class="menu-screen hidden" style="background: rgba(0,0,0,0.95);">
+            <div class="gold-glow">BRAVO TÜM KÜRTLERİ SİKTİN SENİNLE GURUR DUYUYORUM</div>
+            <a id="share-link" class="share-btn" target="_blank">ZAFERİ WHATSAPP'TA PAYLAŞ</a>
+            <button class="diff-btn" style="background:#f1c40f;margin-top:30px;" onclick="location.reload()">Tekrar Oyna</button>
+        </div>
+
+        <div id="lose-screen" class="menu-screen hidden" style="background: rgba(0,0,0,0.95);">
+            <div class="gold-glow">YARRAĞI FENA YEDİN ÜZÜLME BEN SENİ TUTUYORUM TEKRAR DENE :)</div>
+            <button class="diff-btn" style="background:#ffcc00;" onclick="location.reload()">Yeniden Başla</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedImg = '', selectedName = '', difficulty = 'medium';
+        let config = { playerSpeed: 5, enemySpeed: 2, maxAmmo: 30 };
+        let player = { x: 85, y: 0, hp: 100, score: 0, ammo: 30, angle: 0 };
+        let keys = {}, desks = [], enemies = [], bullets = [], deadEnemiesCount = 0;
+        let isMobile = false, moveJoy = { x: 0, y: 0 }, shootJoy = { x: 0, y: 0, active: false };
+
+        const gameArea = document.getElementById('game-area');
+        const playerEl = document.getElementById('player');
+        const weaponEl = document.getElementById('weapon');
+
+        if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+            isMobile = true; document.getElementById('mobile-controls').style.display = 'block';
+        }
+
+        function openPopup() { document.getElementById('popup-msg').classList.remove('hidden'); }
+        function closePopup() { document.getElementById('popup-msg').classList.add('hidden'); }
+
+        function selectCharacter(img, name) {
+            selectedImg = img; selectedName = name;
+            document.getElementById('char-screen').classList.add('hidden');
+            document.getElementById('diff-screen').classList.remove('hidden');
+        }
+
+        function setDifficulty(diff) {
+            difficulty = diff;
+            document.getElementById('diff-screen').classList.add('hidden');
+            // Oyun alanını açmak yerine önce uyarı ekranını açıyoruz
+            document.getElementById('warning-screen').classList.remove('hidden');
+
+            if (diff === 'easy') { config.enemySpeed = 2.0; config.maxAmmo = 60; }
+            else if (diff === 'medium') { config.enemySpeed = 3.5; config.maxAmmo = 40; }
+            else if (diff === 'hard') { config.enemySpeed = 5.0; config.maxAmmo = 20; }
+        }
+
+        function toggleStartButton() {
+            const checkBox = document.getElementById('warning-check');
+            const startBtn = document.getElementById('start-game-btn');
+            startBtn.disabled = !checkBox.checked;
+        }
+
+        function launchGame() {
+            document.getElementById('warning-screen').classList.add('hidden');
+            gameArea.style.display = 'block';
+            player.y = window.innerHeight - 65;
+
+            player.ammo = config.maxAmmo;
+            playerEl.style.backgroundImage = `url('${selectedImg}')`;
+            document.getElementById('player-name-tag').innerText = selectedName;
+
+            buildDesks();
+            initGameLoop();
+        }
+
+        function buildDesks() {
+            const room = document.getElementById('room-area');
+            const limitH = window.innerHeight * 0.49;
+            for (let row = 0; row < 3; row++) {
+                for (let col = 0; col < 5; col++) {
+                    const d = document.createElement('div'); d.classList.add('desk'); d.innerText = "SIRA";
+                    let w = 80, h = 45, x = 150 + col * 130, y = 80 + row * 75;
+                    if (x + w < window.innerWidth && y + h < limitH - 10) {
+                        d.style.left = x + 'px'; d.style.top = y + 'px'; d.style.width = w + 'px'; d.style.height = h + 'px';
+                        room.appendChild(d); desks.push({ x: x, y: y, w: w, h: h });
+                    }
+                }
+            }
+        }
+
+        document.addEventListener('keydown', (e) => { keys[e.key.toLowerCase()] = true; });
+        document.addEventListener('keyup', (e) => { keys[e.key.toLowerCase()] = false; });
+        
+        window.addEventListener('click', (e) => {
+            if (gameArea.style.display !== 'block' || isMobile) return;
+            let angle = Math.atan2(e.clientY - player.y, e.clientX - player.x);
+            shoot(angle);
+        });
+
+        setupJoystick('move-joy-container', 'move-stick', (x, y) => { moveJoy.x = x; moveJoy.y = y; });
+        
+        const shootContainer = document.getElementById('shoot-joy-container');
+        const shootStick = document.getElementById('shoot-stick');
+        shootContainer.addEventListener('touchstart', (e) => { shootJoy.active = true; handleShoot(e); });
+        shootContainer.addEventListener('touchmove', (e) => { if (shootJoy.active) handleShoot(e); });
+        shootContainer.addEventListener('touchend', () => {
+            if (shootJoy.active && Math.hypot(shootJoy.x, shootJoy.y) > 0.2) {
+                shoot(Math.atan2(shootJoy.y, shootJoy.x));
+            }
+            shootStick.style.transform = `translate(0px, 0px)`;
+            shootJoy.x = 0; shootJoy.y = 0; shootJoy.active = false;
+        });
+
+        function handleShoot(e) {
+            const t = e.touches[0]; const r = shootContainer.getBoundingClientRect();
+            let dx = t.clientX - (r.left + r.width/2); let dy = t.clientY - (r.top + r.height/2);
+            let dist = Math.hypot(dx, dy); let max = r.width/2;
+            if (dist > max) { dx = (dx/dist)*max; dy = (dy/dist)*max; }
+            shootStick.style.transform = `translate(${dx}px, ${dy}px)`;
+            shootJoy.x = dx/max; shootJoy.y = dy/max;
+            player.angle = Math.atan2(dy, dx);
+            weaponEl.style.transform = `translateY(-50%) rotate(${player.angle}rad)`;
+        }
+
+        function setupJoystick(cId, sId, callback) {
+            const c = document.getElementById(cId); const s = document.getElementById(sId);
+            const handle = (e) => {
+                const t = e.touches[0]; const r = c.getBoundingClientRect();
+                let dx = t.clientX - (r.left + r.width/2); let dy = t.clientY - (r.top + r.height/2);
+                let dist = Math.hypot(dx, dy); let max = r.width/2;
+                if (dist > max) { dx = (dx/dist)*max; dy = (dy/dist)*max; }
+                s.style.transform = `translate(${dx}px, ${dy}px)`; callback(dx/max, dy/max);
+            };
+            c.addEventListener('touchstart', handle); c.addEventListener('touchmove', handle);
+            c.addEventListener('touchend', () => { s.style.transform = `translate(0px,0px)`; callback(0,0); });
+        }
+
+        function shoot(angle) {
+            if (player.ammo <= 0) return;
+            player.ammo--; document.getElementById('hud-ammo').innerText = player.ammo;
+            player.angle = angle;
+            weaponEl.style.transform = `translateY(-50%) rotate(${angle}rad)`;
+
+            const b = document.createElement('div'); b.classList.add('bullet');
+            gameArea.appendChild(b);
+            bullets.push({ el: b, x: player.x, y: player.y, vx: Math.cos(angle)*13, vy: Math.sin(angle)*13 });
+        }
+
+        function sendToBin() {
+            deadEnemiesCount++;
+            document.getElementById('bin-count-val').innerText = deadEnemiesCount;
+            const deadVis = document.createElement('div');
+            deadVis.classList.add('stacked-dead');
+            deadVis.style.left = (Math.random() * 25 + 10) + 'px';
+            deadVis.style.top = (Math.random() * 25 + 10) + 'px';
+            document.getElementById('red-bin').appendChild(deadVis);
+        }
+
+        function spawnEnemy() {
+            if (gameArea.style.display !== 'block' || player.score >= 100) return;
+            const eEl = document.createElement('div'); eEl.classList.add('enemy');
+            const t = document.createElement('div'); t.classList.add('enemy-text'); t.innerText = 'KÜRT';
+            eEl.appendChild(t); gameArea.appendChild(eEl);
+
+            let spawnInRoom = Math.random() > 0.5;
+            let rx = window.innerWidth + 50;
+            let ry = spawnInRoom ? (Math.random() * (window.innerHeight * 0.45) + 30) : (Math.random() * (window.innerHeight * 0.45) + (window.innerHeight * 0.55));
+
+            enemies.push({ el: eEl, x: rx, y: ry, inRoom: spawnInRoom });
+        }
+
+        function checkWallCollision(oldX, oldY, newX, newY, size) {
+            let midY = window.innerHeight * 0.49;
+            if (oldY <= midY && newY > midY - size) {
+                if (newX < 180 || newX > 270) return { x: newX, y: midY - size };
+            }
+            if (oldY >= midY + 10 && newY < midY + 10 + size) {
+                if (newX < 180 || newX > 270) return { x: newX, y: midY + 10 + size };
+            }
+            return { x: newX, y: newY };
+        }
+
+        function initGameLoop() {
+            setInterval(spawnEnemy, 1700);
+
+            function update() {
+                if (player.hp <= 0 || player.score >= 100) return;
+
+                let midY = window.innerHeight * 0.49;
+                let pSpeed = config.playerSpeed;
+                let inDesk = false;
+                for (let d of desks) {
+                    if (player.x >= d.x && player.x <= d.x + d.w && player.y >= d.y && player.y <= d.y + d.h) { inDesk = true; break; }
+                }
+                if (inDesk) pSpeed *= 0.45;
+
+                let oldX = player.x, oldY = player.y;
+                let nextX = player.x, nextY = player.y;
+
+                if (keys['w'] || keys['arrowup']) nextY -= pSpeed;
+                if (keys['s'] || keys['arrowdown']) nextY += pSpeed;
+                if (keys['a'] || keys['arrowleft']) nextX -= pSpeed;
+                if (keys['d'] || keys['arrowright']) nextX += pSpeed;
+
+                if (isMobile && (Math.abs(moveJoy.x) > 0.05 || Math.abs(moveJoy.y) > 0.05)) {
+                    nextX += moveJoy.x * pSpeed; nextY += moveJoy.y * pSpeed;
+                }
+
+                let pos = checkWallCollision(oldX, oldY, nextX, nextY, 25);
+                player.x = pos.x; player.y = pos.y;
+
+                if (player.x < 25) player.x = 25; if (player.x > window.innerWidth - 25) player.x = window.innerWidth - 25;
+                if (player.y < 25) player.y = 25; if (player.y > window.innerHeight - 25) player.y = window.innerHeight - 25;
+
+                playerEl.style.left = player.x + 'px'; playerEl.style.top = player.y + 'px';
+
+                // Mermiler
+                for (let i = bullets.length - 1; i >= 0; i--) {
+                    let b = bullets[i]; b.x += b.vx; b.y += b.vy;
+                    b.el.style.left = b.x + 'px'; b.el.style.top = b.y + 'px';
+
+                    if (b.x < 0 || b.x > window.innerWidth || b.y < 0 || b.y > window.innerHeight) {
+                        b.el.remove(); bullets.splice(i, 1); continue;
+                    }
+
+                    for (let j = enemies.length - 1; j >= 0; j--) {
+                        let e = enemies[j];
+                        if (Math.hypot(b.x - e.x, b.y - e.y) < 32) {
+                            e.el.remove(); enemies.splice(j, 1);
+                            b.el.remove(); bullets.splice(i, 1);
+                            sendToBin();
+                            player.score += 10;
+                            document.getElementById('hud-score').innerText = player.score;
+
+                            if (player.score >= 100) {
+                                triggerWin();
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                // Düşmanlar
+                for (let j = enemies.length - 1; j >= 0; j--) {
+                    let e = enemies[j];
+                    let eSpeed = config.enemySpeed;
+                    
+                    let eInDesk = false;
+                    for (let d of desks) {
+                        if (e.x >= d.x && e.x <= d.x + d.w && e.y >= d.y && e.y <= d.y + d.h) { eInDesk = true; break; }
+                    }
+                    if (eInDesk) eSpeed *= 0.70;
+
+                    if (e.y <= midY) {
+                        let targetGateX = 225;
+                        if (Math.abs(e.x - targetGateX) > 15) {
+                            e.x += (e.x > targetGateX ? -1 : 1) * eSpeed;
+                        } else {
+                            e.y += eSpeed;
+                        }
+                    } else {
+                        let angle = Math.atan2(player.y - e.y, player.x - e.x);
+                        let eNextX = e.x + Math.cos(angle) * eSpeed;
+                        let eNextY = e.y + Math.sin(angle) * eSpeed;
+
+                        let ePos = checkWallCollision(e.x, e.y, eNextX, eNextY, 25);
+                        e.x = ePos.x; e.y = ePos.y;
+                    }
+
+                    e.el.style.left = e.x + 'px'; e.el.style.top = e.y + 'px';
+
+                    if (Math.hypot(player.x - e.x, player.y - e.y) < 48) {
+                        player.hp -= 20;
+                        document.getElementById('hud-hp').innerText = player.hp;
+                        e.el.remove(); enemies.splice(j, 1);
+
+                        if (player.hp <= 0) {
+                            document.getElementById('lose-screen').classList.remove('hidden');
+                        }
+                    }
+                }
+
+                if (player.hp > 0 && player.score < 100) requestAnimationFrame(update);
+            }
+            requestAnimationFrame(update);
+        }
+
+        function triggerWin() {
+            document.getElementById('win-screen').classList.remove('hidden');
+            let text = encodeURIComponent(`${selectedName}, TÜM KÜRTLERİ SİKTİ TEBRİK EDİYORUZ! 🏆 Sen de bu amansız 11/C koridor savaşına katıl ve rekorunu kır! Link: ${window.location.origin}${window.location.pathname}`);
+            let waUrl = `https://api.whatsapp.com/send?text=${text}`;
+            document.getElementById('share-link').setAttribute('href', waUrl);
+        }
+    </script>
+</body>
+</html>
